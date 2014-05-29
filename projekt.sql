@@ -95,7 +95,7 @@ create trigger zwieksz_wartosc_produktu_i_zamowienia before insert or update on 
 
 
 drop role if exists owner;
-create role owner login encrypted password 'owner.8';
+create role owner;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from owner cascade;
 grant insert on produkt to owner;
 grant update on zamowienie to owner;
@@ -103,7 +103,7 @@ grant select on zamowienie, dostarcza, typ_produktu, produkt to owner;
 grant select on dostawca, kupujacy to owner;
 
 drop role if exists buyer;
-create role buyer login encrypted password 'buyer.8';
+create role buyer;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from buyer cascade;
 grant update on produkt to buyer;
 grant insert, update on zamowienie to buyer;
@@ -111,7 +111,7 @@ grant select on produkt, typ_produktu to buyer;
 grant select on wlasciciel to buyer;
 
 drop role if exists provider;
-create role provider login encrypted password 'provider.8';
+create role provider;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from provider cascade;
 grant insert, update on typ_produktu, dostarcza to provider;
 grant select on dostarcza, typ_produktu to provider;
