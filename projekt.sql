@@ -100,7 +100,7 @@ revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, 
 grant insert on produkt to owner;
 grant update on zamowienie to owner;
 grant select on zamowienie, dostarcza, typ_produktu, produkt to owner;
-grant select on dostawca, kupujacy, wlasciciel to owner;
+grant select on dostawca, kupujacy to owner;
 
 drop role if exists buyer;
 create role buyer login encrypted password 'buyer.8';
@@ -108,11 +108,11 @@ revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, 
 grant update on produkt to buyer;
 grant insert, update on zamowienie to buyer;
 grant select on produkt, typ_produktu to buyer;
-grant select on dostawca, kupujacy, wlasciciel to buyer;
+grant select on wlasciciel to buyer;
 
 drop role if exists provider;
 create role provider login encrypted password 'provider.8';
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from provider cascade;
 grant insert, update on typ_produktu, dostarcza to provider;
 grant select on dostarcza, typ_produktu to provider;
-grant select on dostawca, kupujacy, wlasciciel to provider;
+grant select on wlasciciel to provider;
