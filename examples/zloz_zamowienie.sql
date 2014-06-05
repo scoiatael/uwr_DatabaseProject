@@ -1,2 +1,2 @@
-update zamowienie set zlozenie = current_date where zaid = 1;
-update produkt set zaid = 2 where zaid is null;
+select * from zloz_zamowienie_jako(1,1);
+select * from zamowienie;
