@@ -4,6 +4,7 @@ drop sequence if exists tpid_seq cascade;
 create sequence tpid_seq;
 create table typ_produktu (
   tpid integer primary key default nextval('tpid_seq'),
+  nazwa text,
   opis text
 );
 
@@ -115,4 +116,5 @@ create role provider;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from provider cascade;
 grant insert, update on typ_produktu, dostarcza to provider;
 grant select on dostarcza, typ_produktu to provider;
-grant select on wlasciciel to provider;
+--grant select on wlasciciel to provider;
+grant delete on dostarcza to provider;
