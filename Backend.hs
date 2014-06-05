@@ -23,44 +23,78 @@ prettifyStringList (a,l) = let
 padTo :: Int -> String -> String
 padTo l s = s ++ replicate (l - length s) ' '
 
+type asSomeone a = Int -> a
+
 --Admin
 ---add new buyer
-newBuyer :: String -> DBTransaction ()
+newBuyer :: String -> String -> DBTransaction ()
+deleteBuyer :: Int -> DBTransaction ()
+logAsBuyer :: Int -> String -> DBTransaction ()
+
 ---add new provider
-addProvider :: String -> DBTransaction ()
+addProvider :: String -> String -> DBTransaction ()
+deleteProvider :: Int -> DBTransaction ()
+logAsProvider :: Int -> String -> DBTransaction ()
+
 ---add new owner
-addOwner :: String -> DBTransaction ()
+addOwner :: String -> String -> DBTransaction ()
+deleteOwner :: Int -> DBTransaction ()
+logAsOwner :: Int -> String -> DBTransaction ()
 
 --Owner
+type asOwner a = asSomeone a
 ---add new product
-addProduct :: Int -> Int -> Int -> Int-> DBTransaction ()
----set order to realized
-realizeOrder :: Int -> DBTransaction ()
+addProduct :: asOwner ( 
+  Int -> Int -> DBTransaction () )
+---set order to realized -- check if thats his order
+realizeOrder :: asOwner (
+  Int -> DBTransaction () )
 ---see his history (orders, customers and product number)
-ownerHistory :: Int -> DBTransaction [String]
+ownerHistory :: asOwner (
+  DBTransaction [String] )
 ---see particular order
-ownerOrderDetails :: Int -> DBTransaction [String]
+ownerOrderDetails :: asOwner (
+  DBTransaction [String] )
 ---see unrealized orders and customers contacts
-unrealized :: Int -> DBTransaction [String]
+ownerUnrealized :: asOwner ( 
+  DBTransaction [String] )
 ---see all types of products that can be provided
-ownerAvailible :: Int -> DBTransaction [String]
+ownerAvailible :: asOwner (
+  DBTransaction [String] )
 ---list providers who can deliver particular type of product
-listProviders :: Int -> DBTransaction [String]
+listProviders :: asOwner (
+  Int -> DBTransaction [String] )
  
 --Buyer
+type asBuyer a = asSomeone a
 ---add new order
+addOrder :: asBuyer ( Int -> DBTransaction () )
+---add given product to given order -- check if owner has this product and check if this buyer has this order
+addProductToOrder :: asBuyer ( Int -> Int -> DBTransaction () )
+---finish composing order -- check ownership of order
+finishOrder :: asBuyer (Int -> DBTransaction () )
 ---see history (orders)
----list all unrealized orders
+buyerHistory :: asBuyer ( DBTransaction [String] )
+---list all unfinished orders
+buyerUnfinished :: asBuyer ( DBTransaction [String] )
 ---list all products that can be added to given order
----add given product to given order
----finish composing order
+buyerOptions :: asBuyer ( Int -> DBTransaction [String] )
 ---see all types of products
+buyerAllTypes :: asBuyer ( DBTransaction [String] )
 ---see which owner has given product
+whoHasX :: asBuyer ( Int -> DBTransaction [String] )
 
 --Provider
----see all owners
----see all types of products
+type asProvider a = asSomeone a
+---add new type of product
+addType :: asProvider ( 
+  String -> String -> DBTransaction () )
 ---add new type of product he can deliver
+addProvision :: asProvider ( 
+  Int -> Int -> DBTransaction () )
 ---delete type of product he no longer can deliver
+deleteType :: asProvider ( Int -> DBTransaction () )
+---see all types of products
+allTypes :: asProvider ( DBTransaction [String] )
 
 runT = runTransaction

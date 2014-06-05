@@ -17,6 +17,16 @@ create table kupujacy (
   mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)')
 );
 
+drop table if exists wlasciciel cascade;
+drop sequence if exists wlid_seq cascade;
+
+create sequence wlid_seq;
+create table wlasciciel (
+  wlid integer primary key default nextval('wlid_seq'),
+  mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)'),
+  marza decimal(3,2) not null check ( marza < 1 and marza > 0)
+);
+
 drop table if exists zamowienie cascade;
 drop sequence if exists zaid_seq cascade;
 
@@ -26,7 +36,8 @@ create table zamowienie (
   realizacja date null check (realizacja > zlozenie),
   zlozenie date null,
   wartosc integer not null default 0,
-  kuid integer not null references kupujacy
+  kuid integer not null references kupujacy,
+  wlid integer not null references wlasciciel
 );
 
 drop table if exists dostawca cascade;
@@ -36,16 +47,6 @@ create sequence doid_seq;
 create table dostawca (
   doid integer primary key default nextval('doid_seq'),
   mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)')
-);
-
-drop table if exists wlasciciel cascade;
-drop sequence if exists wlid_seq cascade;
-
-create sequence wlid_seq;
-create table wlasciciel (
-  wlid integer primary key default nextval('wlid_seq'),
-  mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)'),
-  marza decimal(3,2) not null check ( marza < 1 and marza > 0)
 );
 
 drop table if exists produkt cascade;
@@ -94,6 +95,58 @@ $$ language plpgsql;
 create trigger zwieksz_wartosc_produktu_i_zamowienia before insert or update on produkt
   for each row execute procedure zwieksz_wartosc_produktu_i_zamowienia();
 
+drop function if exists usun_niedostarczany_typ_produktu() cascade;
+
+create function usun_niedostarczany_typ_produktu() returns trigger as $$
+begin
+  delete from typ_produktu where typ_produktu.tpid = OLD.tpid and 
+    not exists ( select * from dostarcza where dostarcza.tpid = OLD.tpid );
+  return old;
+end
+$$ language plpgsql;
+
+create trigger usun_niedostarczany_typ_produktu after delete on dostarcza
+  for each row execute procedure usun_niedostarczany_typ_produktu();
+
+drop function if exists wykonaj_zamowienie_jako(int, int) cascade;
+
+create function wykonaj_zamowienie_jako(owner int, ord int) returns setof void as $$
+begin
+  if ( not exists (select * from zamowienie where zaid = ord and wlid = owner)) then
+    raise exception 'to nie jest to zamowienie tego wlasciciela';
+  end if;
+  update zamowienie set realizacja = current_date;
+  return;
+end
+$$ language plpgsql;
+
+
+drop function if exists zloz_zamowienie_jako(int, int) cascade;
+
+create function zloz_zamowienie_jako( buyer int, ord int) returns setof void as $$
+begin
+  if ( not exists (select * from zamowienie where zaid = ord and kuid = buyer)) then
+    raise exception 'to nie jest zamowienie tego kupujacego';
+  end if;
+  update zamowienie set zlozenie = current_date;
+  return;
+end
+$$ language plpgsql;
+
+drop function if exists dodaj_do_zamowienia_jako(int,int,int) cascade;
+create function dodaj_do_zamowienia_jako(buyer int, ord int, pro int) returns setof void as $$
+begin
+  if ( not exists (select * from zamowienie where zaid = ord and kuid = buyer )) then
+    raise exception 'to nie jest zamowienie tego kupujacego';
+  end if;
+  if ( not exists ( 
+    select * from produkt join zamowienie using (wlid) where prid = pro and zaid = ord )) then
+    raise exception 'ten wlasciciel nie ma tego produktu';
+  end if;
+  update produkt set zaid = ord where prid = pro;
+  return;
+end
+$$ language plpgsql;
 
 drop role if exists owner;
 create role owner;
