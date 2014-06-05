@@ -46,24 +46,45 @@ type asOwner a = asSomeone a
 ---add new product
 addProduct :: asOwner ( 
   Int -> Int -> DBTransaction () )
+addProduct own prd prv = runQuery "insert produkt (wlid, tpid, doid) values (?,?,?);" $ 
+  map toSql [own,prd,prv]
 ---set order to realized -- check if thats his order
 realizeOrder :: asOwner (
   Int -> DBTransaction () )
----see his history (orders, customers and product number)
+realizeOrder own ord = runQuery "select * from wykonaj_zamowienie_jako(?,?);" $ map toSql [own, ord]
+---see his history (orders, customers)
 ownerHistory :: asOwner (
   DBTransaction [String] )
+ownerHistory own = liftDB (convertPrettifyAddHeader \
+  \ ["data_zlozenia", "data_realizacji", "wartosc", "kupujacy" ]) $ \
+   \ query ( "select zlozenie, realizacja, wartosc, mail " ++ \ 
+    \ "from zamowienie join kupujacy using (kuid) where wlid = ?;") [toSql own]
 ---see particular order
 ownerOrderDetails :: asOwner (
-  DBTransaction [String] )
+  Int -> DBTransaction [String] )
+ownerOrderDetails own ord = liftDB (convertPrettifyAddHeader \
+  \ ["nr produktu", "produkt"] ) $ \
+   \ query "select * from zamowienie join produkt using (zaid) where wlid = ? and zamowienie.wlid = ?;" \
+    \ [toSql own, toSql ord]
 ---see unrealized orders and customers contacts
 ownerUnrealized :: asOwner ( 
   DBTransaction [String] )
+ownerUnrealized own = liftDB (convertPrettifyAddHeader \
+  \ ["data_zlozenia", "wartosc", "kupujacy" ]) $ \
+   \ query ( "select zlozenie, wartosc, mail " ++ \ 
+    \ "from zamowienie join kupujacy using (kuid) where wlid = ? and realizacja is null;") [toSql own]
 ---see all types of products that can be provided
 ownerAvailible :: asOwner (
   DBTransaction [String] )
+ownerAvailible _ = liftDB (convertPrettifyAddHeader \
+  \ ["nazwa", "opis"]) $ \
+   \ query "select nazwa, opis from typ_produktu;"
 ---list providers who can deliver particular type of product
 listProviders :: asOwner (
   Int -> DBTransaction [String] )
+listProviders _ tp = liftDB (convertPrettifyAddHeader \
+  \ ["cena", "dostawca"]) $ \
+   \ query "select cena, mail from dostarcza join dostawca using (doid) where tpid = ?;" [toSql tp]
  
 --Buyer
 type asBuyer a = asSomeone a

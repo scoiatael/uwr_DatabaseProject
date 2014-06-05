@@ -33,7 +33,7 @@ drop sequence if exists zaid_seq cascade;
 create sequence zaid_seq;
 create table zamowienie (
   zaid integer primary key default nextval('zaid_seq'),
-  realizacja date null check (realizacja > zlozenie),
+  realizacja date null check (realizacja >= zlozenie),
   zlozenie date null,
   wartosc integer not null default 0,
   kuid integer not null references kupujacy,
@@ -83,6 +83,10 @@ begin
   if (new.zaid is not null and not exists (select * from zamowienie where zamowienie.zaid = new.zaid)) then
     raise exception 'nie mozna dodac do nieistniejacego zamowienia';
   end if;
+  if (not exists (
+    select * from dostarcza where dostarcza.doid = new.doid and dostarcza.tpid = new.tpid)) then
+    raise exception 'ten dostawca nie ma tego produktu';
+  end if;
   select into new.cena (1.00 + Y.marza) * X.cena from (select cena from dostarcza where dostarcza.tpid = new.tpid and dostarcza.doid = new.doid) X
     cross join (select marza from wlasciciel where wlasciciel.wlid = new.wlid) Y;
   if (new.zaid is not null) then
@@ -115,6 +119,10 @@ begin
   if ( not exists (select * from zamowienie where zaid = ord and wlid = owner)) then
     raise exception 'to nie jest to zamowienie tego wlasciciela';
   end if;
+  if (not exists ( 
+    select * from zamowienie where zaid = ord and wlid = owner and zlozenie <= current_date)) then
+    raise exception 'nie mozna zrealizowac niezlozonego zamowienia';
+  end if;
   update zamowienie set realizacja = current_date;
   return;
 end
@@ -128,7 +136,7 @@ begin
   if ( not exists (select * from zamowienie where zaid = ord and kuid = buyer)) then
     raise exception 'to nie jest zamowienie tego kupujacego';
   end if;
-  update zamowienie set zlozenie = current_date;
+  update zamowienie set zlozenie = current_date where zaid = ord;
   return;
 end
 $$ language plpgsql;
