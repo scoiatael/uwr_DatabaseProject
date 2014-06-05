@@ -23,139 +23,142 @@ prettifyStringList (a,l) = let
 padTo :: Int -> String -> String
 padTo l s = s ++ replicate (l - length s) ' '
 
-type asSomeone a = Int -> a
+type AsSomeone a = Int -> a
 
 --Admin
 ---add new buyer
 addBuyer :: String -> String -> DBTransaction ()
-addBuyer mail pass = query "insert into kupujacy (mail) values ?;" [toSql mail]
-deleteBuyer :: Int -> DBTransaction ()
+addBuyer mail pass = runQuery "insert into kupujacy (mail) values ?;" [toSql mail]
 logAsBuyer :: Int -> String -> DBTransaction ()
+logAsBuyer _ _ = runQuery "set role 'buyer';" []
 
 ---add new provider
 addProvider :: String -> String -> DBTransaction ()
-addProvider mail pass = query "insert into dostawca (mail) values ?;" [toSql mail]
-deleteProvider :: Int -> DBTransaction ()
+addProvider mail pass = runQuery "insert into dostawca (mail) values ?;" [toSql mail]
 logAsProvider :: Int -> String -> DBTransaction ()
+logAsProvider _ _ = runQuery "set role 'provider';" []
 
 ---add new owner
-addOwner :: String -> Float -> String -> DBTransaction ()
-addProvider mail markup pass = query "insert into wlasciciel (mail,marza) values (?,?);" $
+addOwner :: String -> Rational -> String -> DBTransaction ()
+addOwner mail markup pass = runQuery "insert into wlasciciel (mail,marza) values (?,?);" $
   [toSql mail, toSql markup]
-deleteOwner :: Int -> DBTransaction ()
 logAsOwner :: Int -> String -> DBTransaction ()
+logAsOwner _ _ = runQuery "set role 'owner';" []
+
+resetRole = query "reset role;" []
 
 --Owner
-type asOwner a = asSomeone a
+type AsOwner a = AsSomeone a
 ---add new product
-addProduct :: asOwner ( 
+addProduct :: AsOwner ( 
   Int -> Int -> DBTransaction () )
 addProduct own prd prv = runQuery "insert produkt (wlid, tpid, doid) values (?,?,?);" $ 
   map toSql [own,prd,prv]
 ---set order to realized -- check if thats his order
-realizeOrder :: asOwner (
+realizeOrder :: AsOwner (
   Int -> DBTransaction () )
 realizeOrder own ord = runQuery "select * from wykonaj_zamowienie_jako(?,?);" $ map toSql [own, ord]
 ---see his history (orders, customers)
-ownerHistory :: asOwner (
+ownerHistory :: AsOwner (
   DBTransaction [String] )
-ownerHistory own = liftDB (convertPrettifyAddHeader \
-  \ ["data_zlozenia", "data_realizacji", "wartosc", "kupujacy" ]) $ \
-   \ query ( "select zlozenie, realizacja, wartosc, mail " ++ \ 
-    \ "from zamowienie join kupujacy using (kuid) where wlid = ?;") [toSql own]
+ownerHistory own = liftDB (convertPrettifyAddHeader 
+   ["data_zlozenia", "data_realizacji", "wartosc", "kupujacy" ]) $ 
+    query ( "select zlozenie, realizacja, wartosc, mail \
+     \ from zamowienie join kupujacy using (kuid) where wlid = ?;") [toSql own]
 
 ---see particular order
-ownerOrderDetails :: asOwner (
+ownerOrderDetails :: AsOwner (
   Int -> DBTransaction [String] )
-ownerOrderDetails own ord = liftDB (convertPrettifyAddHeader \
-  \ ["nr produktu", "produkt"] ) $ \
-   \ query "select * from zamowienie join produkt using (zaid) where wlid = ? and zamowienie.wlid = ?;" \
-    \ [toSql own, toSql ord]
+ownerOrderDetails own ord = liftDB (convertPrettifyAddHeader 
+   ["nr produktu", "produkt"] ) $ 
+    query "select * from zamowienie join produkt using (zaid) where wlid = ? and zamowienie.wlid = ?;"
+     [toSql own, toSql ord]
 ---see unrealized orders and customers contacts
-ownerUnrealized :: asOwner ( 
+ownerUnrealized :: AsOwner ( 
   DBTransaction [String] )
-ownerUnrealized own = liftDB (convertPrettifyAddHeader \
-  \ ["data_zlozenia", "wartosc", "kupujacy" ]) $ \
-   \ query ( "select zlozenie, wartosc, mail " ++ \ 
-    \ ("from zamowienie join kupujacy using (kuid) " ++ 
-     \ "where wlid = ? and realizacja is null and zlozenie is not null;")) [toSql own]
+ownerUnrealized own = liftDB (convertPrettifyAddHeader 
+   ["data_zlozenia", "wartosc", "kupujacy" ]) $ 
+    query ( "select zlozenie, wartosc, mail \ 
+    \ from zamowienie join kupujacy using (kuid) \
+     \ where wlid = ? and realizacja is null and zlozenie is not null;") [toSql own]
 ---see all types of products that can be provided
-ownerAvailible :: asOwner (
+ownerAvailible :: AsOwner (
   DBTransaction [String] )
-ownerAvailible _ = liftDB (convertPrettifyAddHeader \
-  \ ["nazwa", "opis"]) $ \
-   \ query "select nazwa, opis from typ_produktu;"
+ownerAvailible _ = liftDB (convertPrettifyAddHeader
+   ["nazwa", "opis"]) $ 
+    query "select nazwa, opis from typ_produktu;" []
 ---list providers who can deliver particular type of product
-listProviders :: asOwner (
+listProviders :: AsOwner (
   Int -> DBTransaction [String] )
-listProviders _ tp = liftDB (convertPrettifyAddHeader \
-  \ ["cena", "dostawca"]) $ \
-   \ query "select cena, mail from dostarcza join dostawca using (doid) where tpid = ?;" [toSql tp]
+listProviders _ tp = liftDB (convertPrettifyAddHeader 
+   ["cena", "dostawca"]) $ 
+    query "select cena, mail from dostarcza join dostawca using (doid) where tpid = ?;" [toSql tp]
  
 --Buyer
-type asBuyer a = asSomeone a
+type AsBuyer a = AsSomeone a
 ---add new order
-addOrder :: asBuyer ( Int -> DBTransaction () )
+addOrder :: AsBuyer ( Int -> DBTransaction () )
 addOrder buy own = runQuery "insert into zamowienie (kuid, wlid) values (?,?);" $ map toSql [buy, own]
 ---add given product to given order -- check if owner has this product and check if this buyer has this order
-addProductToOrder :: asBuyer ( Int -> Int -> DBTransaction () )
-addProductToOrder buy ord pr = runQuery "select * from dodaj_do_zamowienia_jako(?,?,?);" $ \
-  \ map toSql [buy, ord, pr]
+addProductToOrder :: AsBuyer ( Int -> Int -> DBTransaction () )
+addProductToOrder buy ord pr = runQuery "select * from dodaj_do_zamowienia_jako(?,?,?);" $ 
+   map toSql [buy, ord, pr]
 ---finish composing order -- check ownership of order
-finishOrder :: asBuyer (Int -> DBTransaction () )
+finishOrder :: AsBuyer (Int -> DBTransaction () )
 finishOrder buy ord = runQuery "select * from zloz_zamowienie_jako(?,?);" $ map toSql [buy, ord]
 ---see history (orders)
-buyerHistory :: asBuyer ( DBTransaction [String] )
-buyerHistory buy = liftDB (convertPrettifyAddHeader \
-  \ ["data_zlozenia", "data_realizacji", "wartosc", "sprzedajacy"]) $ \
-   \ query ("select zlozenie, realizacja, wartosc, mail" ++ \ 
-    \ " from zamowienie join wlasciciel using (wlid) where kuid = ?;") [toSql buy]
+buyerHistory :: AsBuyer ( DBTransaction [String] )
+buyerHistory buy = liftDB (convertPrettifyAddHeader 
+   ["data_zlozenia", "data_realizacji", "wartosc", "sprzedajacy"]) $ 
+    query ("select zlozenie, realizacja, wartosc, mail \
+    \ from zamowienie join wlasciciel using (wlid) where kuid = ?;") [toSql buy]
 --see details of order
-buyerOrderDetails = asBuyer ( Int -> DBTransaction [String])
-buyerOrderDetails buy ord = liftDB (convertPrettifyAddHeader \
-  \ ["nr produktu", "produkt"] ) $ \
-   \ query "select * from zamowienie join produkt using (zaid) where zaid = ? and kuid = ?;" \
-    \ [toSql ord, toSql buy]
+buyerOrderDetails :: AsBuyer ( Int -> DBTransaction [String])
+buyerOrderDetails buy ord = liftDB (convertPrettifyAddHeader 
+   ["nr produktu", "produkt"] ) $ 
+    query "select * from zamowienie join produkt using (zaid) where zaid = ? and kuid = ?;" 
+     [toSql ord, toSql buy]
 ---list all unfinished orders
-buyerUnfinished :: asBuyer ( DBTransaction [String] )
-buyerUnfinished buy = liftDB (convertPrettifyAddHeader \
-  \ ["data_zlozenia", "wartosc", "sprzedajacy"]) $ \
-   \ query ("select wartosc, mail" ++ \ 
-    \ " from zamowienie join wlasciciel using (wlid) where kuid = ? and zlozenie is null;") [toSql buy]
+buyerUnfinished :: AsBuyer ( DBTransaction [String] )
+buyerUnfinished buy = liftDB (convertPrettifyAddHeader 
+   ["data_zlozenia", "wartosc", "sprzedajacy"]) $ 
+    query ("select wartosc, mail \ 
+    \ from zamowienie join wlasciciel using (wlid) where kuid = ? and zlozenie is null;") [toSql buy]
 ---list all products that can be added to given order
-buyerOptions :: asBuyer ( Int -> DBTransaction [String] )
-buyerOptions _ ord = liftDB (convertPrettifyAddHeader \
-  \ ["nazwa", "opis"]) $ \
-   \ query ("select nazwa, opis from typ_produktu join " ++ \
-    \ "(select * from produkt join " ++ \
-     \ "(select wlid from zamowienie where zaid = ?) X " ++ \
-      \ "using (wlid) where zaid is null) Y using (tpid);") [toSql ord]
+buyerOptions :: AsBuyer ( Int -> DBTransaction [String] )
+buyerOptions _ ord = liftDB (convertPrettifyAddHeader 
+   ["nazwa", "opis"]) $ 
+    query ("select nazwa, opis from typ_produktu join \ 
+    \ (select * from produkt join \ 
+     \ (select wlid from zamowienie where zaid = ?) X \ 
+      \ using (wlid) where zaid is null) Y using (tpid);") [toSql ord]
 ---see all types of products
-buyerAllTypes :: asBuyer ( DBTransaction [String] )
+buyerAllTypes :: AsBuyer ( DBTransaction [String] )
 buyerAllTypes a = ownerAvailible a
 ---see which owner has given product type
-whoHasX :: asBuyer ( Int -> DBTransaction [String] )
-whoHasX _ = liftDB (convertPrettifyAddHeader \
-  \ ["cena", "kontakt"]) $ \
-   \ query "select cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;"
+whoHasX :: AsBuyer ( Int -> DBTransaction [String] )
+whoHasX _ tp = liftDB (convertPrettifyAddHeader 
+   ["cena", "kontakt"]) $ 
+    query "select cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;" [toSql tp]
 
 --Provider
-type asProvider a = asSomeone a
+type AsProvider a = AsSomeone a
 ---add new type of product
-addType :: asProvider ( 
+addType :: AsProvider ( 
   String -> String -> DBTransaction () )
-addType _ name desc = query "insert into typ_produktu (nazwa, opis) values (?,?);" $ map toSql [name, desc]
+addType _ name desc = runQuery 
+  "insert into typ_produktu (nazwa, opis) values (?,?);" $ map toSql [name, desc]
 ---delete type of product he no longer can deliver
-deleteType :: asProvider ( Int -> DBTransaction () )
-deleteType pro tp = query "delete from dostarcza where tpid = ? and doid = ?;" $ map toSql [tp, pro]
+deleteType :: AsProvider ( Int -> DBTransaction () )
+deleteType pro tp = runQuery "delete from dostarcza where tpid = ? and doid = ?;" $ map toSql [tp, pro]
 ---add new type of product he can deliver
-addProvision :: asProvider ( 
+addProvision :: AsProvider ( 
   Int -> Int -> DBTransaction () )
-addProvision pro tp pr = deleteType pro tp >> \
-  \ query "insert into dostarcza (tpid, doid, cena) values (?,?,?);" $ \
-   \ [toSql tp, toSql pro, toSql pr]
+addProvision pro tp pr = deleteType pro tp >>
+   (runQuery "insert into dostarcza (tpid, doid, cena) values (?,?,?);" $ 
+    [toSql tp, toSql pro, toSql pr])
 ---see all types of products
-allTypes :: asProvider ( DBTransaction [String] )
+allTypes :: AsProvider ( DBTransaction [String] )
 allTypes a = ownerAvailible a
 
 runT = runTransaction
