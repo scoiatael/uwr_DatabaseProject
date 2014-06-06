@@ -25,17 +25,27 @@ padTo l s = s ++ replicate (l - length s) ' '
 
 --Admin
 ---add new buyer
+newBuyer :: String -> DBTransaction ()
 ---add new provider
+addProvider :: String -> DBTransaction ()
 ---add new owner
+addOwner :: String -> DBTransaction ()
 
 --Owner
 ---add new product
+addProduct :: Int -> Int -> Int -> Int-> DBTransaction ()
 ---set order to realized
+realizeOrder :: Int -> DBTransaction ()
 ---see his history (orders, customers and product number)
+ownerHistory :: Int -> DBTransaction [String]
 ---see particular order
+ownerOrderDetails :: Int -> DBTransaction [String]
 ---see unrealized orders and customers contacts
+unrealized :: Int -> DBTransaction [String]
 ---see all types of products that can be provided
+ownerAvailible :: Int -> DBTransaction [String]
 ---list providers who can deliver particular type of product
+listProviders :: Int -> DBTransaction [String]
  
 --Buyer
 ---add new order
