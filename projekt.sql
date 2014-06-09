@@ -177,5 +177,5 @@ create role provider;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from provider cascade;
 grant insert, update on typ_produktu, dostarcza to provider;
 grant select on dostarcza, typ_produktu to provider;
---grant select on wlasciciel to provider;
+grant select on wlasciciel to provider;
 grant delete on dostarcza to provider;

@@ -160,5 +160,11 @@ addProvision pro tp pr = deleteType pro tp >>
 ---see all types of products
 allTypes :: AsProvider ( DBTransaction [String] )
 allTypes a = ownerAvailible a
+--see all owners he provided for
+listOwners :: AsProvider ( DBTransaction [String] )
+listOwners pro = liftDB (convertPrettifyAddHeader
+  ["typ_produktu", "kontakt"]) $
+    query "select nazwa, mail from produkt join typ_produktu using (tpid) join wlasciciel using (wlid) \
+      \ where doid = ?;" $ [toSql pro]
 
 runT = runTransaction
