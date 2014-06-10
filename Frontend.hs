@@ -1,4 +1,5 @@
 import Backend
+import DBTransaction
 
 import Graphics.Vty.Widgets.All
 import Graphics.Vty.Attributes
@@ -10,20 +11,20 @@ import Control.Monad.Reader
 import Control.Concurrent.MVar
 import Data.Time.LocalTime
 
-type FrontEnd a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int) IO a
+type FrontEnd a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int) DBTransaction a
 runFrontEnd :: FrontEnd a -> IO ()
 runFrontEnd act = do
   c <- newCollection
   m <- newMVar []
   i1 <- newMVar (-1)
   i2 <- newMVar (-1)
-  a <- runReaderT act (c,m, i1, i2) 
+  a <- runTransaction $ runReaderT act (c,m, i1, i2) 
   runUi c defaultContext
 
 runInIO :: FrontEnd () -> FrontEnd (IO ())
 runInIO act = do
   c <- ask
-  return $ runReaderT act c 
+  lift $ runInTrans $ runReaderT act c 
 
 fst4 (a,_,_,_) = a
 snd4 (_,b,_,_) = b

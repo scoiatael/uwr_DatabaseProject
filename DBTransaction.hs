@@ -12,7 +12,9 @@ openOptions = "dbname=" ++ databaseName ++ " user=" ++ adminName
 
 openDatabase = connectPostgreSQL openOptions
 
-type DBTransaction a = ReaderT Connection IO a
+type DBTransactionT = ReaderT Connection
+type DBTransaction = DBTransactionT IO 
+
 liftDB :: (a -> b) -> DBTransaction a -> DBTransaction b
 liftDB = liftM
 
@@ -26,6 +28,11 @@ runTransaction act = do
   commit c
   err <- disconnect c
   return val
+
+runInTrans :: DBTransaction a -> DBTransaction (IO a)
+runInTrans act = do
+  c <- ask
+  return $ runReaderT act c
 
 withConn :: (Connection -> IO a) -> DBTransaction a
 withConn a = do
