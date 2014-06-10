@@ -129,8 +129,40 @@ end
 $$ language plpgsql;
 
 
-drop function if exists zloz_zamowienie_jako(int, int) cascade;
+drop function if exists zaloguj_jako_dostawca(int) cascade;
+create function zaloguj_jako_dostawca(kid int) returns setof void as $$
+begin
+  if ( not exists (select * from dostawca where doid = kid )) then
+    raise exception 'nie ma takiego dostawcy';
+  end if;
+  set role 'provider';
+  return;
+end
+$$ language plpgsql;
 
+drop function if exists zaloguj_jako_wlasciciel(int) cascade;
+create function zaloguj_jako_wlasciciel(kid int) returns setof void as $$
+begin
+  if ( not exists (select * from wlasciciel where wlid = kid )) then
+    raise exception 'nie ma takiego wlasciciela';
+  end if;
+  set role 'owner';
+  return;
+end
+$$ language plpgsql;
+
+drop function if exists zaloguj_jako_kupujacy(int) cascade;
+create function zaloguj_jako_kupujacy(kid int) returns setof void as $$
+begin
+  if ( not exists (select * from kupujacy where kuid = kid )) then
+    raise exception 'nie ma takiego kupujacego';
+  end if;
+  set role 'buyer';
+  return;
+end
+$$ language plpgsql;
+
+drop function if exists zloz_zamowienie_jako(int, int) cascade;
 create function zloz_zamowienie_jako( buyer int, ord int) returns setof void as $$
 begin
   if ( not exists (select * from zamowienie where zaid = ord and kuid = buyer)) then

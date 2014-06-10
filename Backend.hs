@@ -30,20 +30,20 @@ type AsSomeone a = Int -> a
 addBuyer :: String -> String -> DBTransaction ()
 addBuyer mail pass = runQuery "insert into kupujacy (mail) values ?;" [toSql mail]
 logAsBuyer :: Int -> String -> DBTransaction ()
-logAsBuyer _ _ = runQuery "set role 'buyer';" []
+logAsBuyer i _ = runQuery "select * from zaloguj_jako_kupujacy(?);" [toSql i]
 
 ---add new provider
 addProvider :: String -> String -> DBTransaction ()
 addProvider mail pass = runQuery "insert into dostawca (mail) values ?;" [toSql mail]
 logAsProvider :: Int -> String -> DBTransaction ()
-logAsProvider _ _ = runQuery "set role 'provider';" []
+logAsProvider i _ = runQuery "select * from zaloguj_jako_dostawca(?);" [toSql i]
 
 ---add new owner
 addOwner :: String -> Rational -> String -> DBTransaction ()
 addOwner mail markup pass = runQuery "insert into wlasciciel (mail,marza) values (?,?);" $
   [toSql mail, toSql markup]
 logAsOwner :: Int -> String -> DBTransaction ()
-logAsOwner _ _ = runQuery "set role 'owner';" []
+logAsOwner i _ = runQuery "select * from zaloguj_jako_wlasciciel(?);" [toSql i]
 
 resetRole = query "reset role;" []
 
