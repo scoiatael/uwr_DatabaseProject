@@ -8,7 +8,7 @@ import Graphics.Vty.LLInput
 
 import qualified Data.Text as T
 import Control.Monad
-import Control.Monad.Reader (liftIO)
+import Control.Monad.Reader (liftIO, lift)
 import Data.Maybe (fromJust)
 
 main :: IO ()
@@ -22,7 +22,8 @@ main = runFrontEnd $ do
 
 adminScreen = fromButtonList "Admin" $ screenChooser
   [ ("Dodaj uzytkownika", placeholder),
-    ("Usun historie", placeholder) ]
+    ("Stworz baze", createDataBase),
+    ("Usun histore", createDataBase) ]
 
 loginScreen log next = do
   fg <- simpleFocusGroup 
@@ -53,4 +54,7 @@ buyerScreen = placeholder
 ownerScreen = placeholder
 providerScreen = placeholder
 
-  
+createDataBase = runInIO $ do
+  lift $ resetDatabase
+  a <- infoScreen "Zrobione."
+  liftIO a

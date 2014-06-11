@@ -6,8 +6,13 @@ import Control.Monad.Reader
 import Database.HDBC
 import Database.HDBC.PostgreSQL
 
+import System.Process
+
+import qualified Data.Text as T
+
 databaseName = "projekt.db"
 adminName = "postgres"
+baseName = "projekt.sql"
 openOptions = "dbname=" ++ databaseName ++ " user=" ++ adminName
 
 openDatabase = connectPostgreSQL openOptions
@@ -30,7 +35,7 @@ runTransaction :: DBTransaction a -> IO a
 runTransaction act = do
   c <- openDatabase
   val <- unDB act c
-  err <- disconnect c
+--  err <- disconnect c
   return val
 
 runInTrans :: DBTransaction a -> DBTransaction (IO a)
@@ -53,3 +58,7 @@ query s v = withConn $ \c -> quickQuery' c s v
 
 revert :: DBTransaction ()
 revert = withConn rollback
+
+resetDatabase :: DBTransaction ()
+resetDatabase = liftIO $ void $ runCommand 
+  ("psql " ++ databaseName ++ " -U " ++ adminName ++ " < " ++ baseName ++ " > log.info 2&> log.err" )
