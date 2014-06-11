@@ -23,12 +23,33 @@ goodByeScreen c err = do
   let t = "Error occured:\n" ++ seErrorMsg err
   let width = length t
   let height = length $ lines t
-  w <- centered =<< boxFixed width height =<< centered =<< plainText (T.pack t)
+  bW <- newButton $ T.pack "Quit"
+  b <- hCentered $ buttonWidget bW
+  bF <- wfg `addToFocusGroup` b  
+  wText  <- centered =<< boxFixed width height =<< centered =<< plainText (T.pack t)
+  w <- wText `vBox` b
   wfg `onKeyPressed` \_ k _ ->
     error "Quit"
   a <- addToCollection c w wfg
   a
 
+errScreen :: FrontEnd ( SqlError -> IO () )
+errScreen = do
+  b <- backButton
+  fg <- simpleFocusGroup 
+  fg `addWidgetToFG` b
+  cb <- liftIO $ centered b
+  all <- ask
+  let c = fst4 all
+  return $ \err -> do
+    let t = "Error occured:\n" ++ seErrorMsg err
+    let width = length t
+    let height = length $ lines t
+    wText  <- centered =<< boxFixed width height =<< centered =<< plainText (T.pack t)
+    w <- wText `vBox` cb
+    a <- addToCollection c w fg
+    a
+    
 type FrontEnd a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int) DBTransaction a
 runFrontEnd :: FrontEnd a -> IO ()
 runFrontEnd act = do
@@ -42,7 +63,9 @@ runFrontEnd act = do
 runInIO :: FrontEnd () -> FrontEnd (IO ())
 runInIO act = do
   c <- ask
-  lift $ runInTrans $ runReaderT act c 
+  err <- errScreen
+  a <- lift $ runInTrans $ runReaderT act c 
+  return $ a `catchSql` err
 
 fst4 (a,_,_,_) = a
 snd4 (_,b,_,_) = b
@@ -85,6 +108,11 @@ pushToStack mv act = modifyMVar_ mv (return . (act:))
 
 popFromStack :: MVar [IO ()] -> IO (Maybe (IO ()))
 popFromStack mv = modifyMVar mv (return .  safeUnCon)
+
+makeButton (str, f) = liftIO $ do
+  b <- newButton $ T.pack str
+  b `onButtonPressed` \_ -> f
+  return $ buttonWidget b
 
 safeUnCon :: [a] -> ([a], Maybe a)
 safeUnCon [] = ([], Nothing)
@@ -139,11 +167,6 @@ fromButtonList t f = do
   liftIO $ list `onItemActivated` (\(ActivateItemEvent _ a _) -> fs $ T.unpack a)
   addCollection cw fg
   
-
-makeButton (str, f) = liftIO $ do
-  b <- newButton $ T.pack str
-  b `onButtonPressed` \_ -> f
-  return $ buttonWidget b
 
 addWidgetToFG fg w = liftIO $ addToFocusGroup fg w
 
