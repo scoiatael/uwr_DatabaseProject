@@ -1,6 +1,8 @@
 import Backend
 import DBTransaction
 
+import Database.HDBC.Types (SqlError, seErrorMsg)
+
 import Graphics.Vty.Widgets.All
 import Graphics.Vty.Attributes
 import Graphics.Vty.LLInput
@@ -11,6 +13,22 @@ import Control.Monad.Reader
 import Control.Concurrent.MVar
 import Data.Time.LocalTime
 
+import Control.Exception.Base
+  
+catchSql :: IO a -> (SqlError -> IO a) -> IO a
+catchSql = catch
+goodByeScreen :: Collection -> SqlError -> IO ()
+goodByeScreen c err = do
+  wfg <- newFocusGroup
+  let t = "Error occured:\n" ++ seErrorMsg err
+  let width = length t
+  let height = length $ lines t
+  w <- centered =<< boxFixed width height =<< centered =<< plainText (T.pack t)
+  wfg `onKeyPressed` \_ k _ ->
+    error "Quit"
+  a <- addToCollection c w wfg
+  a
+
 type FrontEnd a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int) DBTransaction a
 runFrontEnd :: FrontEnd a -> IO ()
 runFrontEnd act = do
@@ -18,7 +36,7 @@ runFrontEnd act = do
   m <- newMVar []
   i1 <- newMVar (-1)
   i2 <- newMVar (-1)
-  a <- runTransaction $ runReaderT act (c,m, i1, i2) 
+  (flip catchSql) (goodByeScreen c) $ void $ runTransaction $ runReaderT act (c,m, i1, i2) 
   runUi c defaultContext
 
 runInIO :: FrontEnd () -> FrontEnd (IO ())
@@ -91,7 +109,7 @@ simpleText t = do
   let width = length t
   let height = length $ lines t
   txt <- liftIO $ plainText $ T.pack t
-  liftIO $ ( {-- boxFixed width height =<< --} centered txt)
+  liftIO $ ( boxFixed width height =<< centered txt)
 
 infoScreen :: String -> FrontEnd (IO ())
 infoScreen t = do
@@ -103,7 +121,6 @@ infoScreen t = do
   cw <- liftIO $ ct <--> cb
   addWidgetToFG fg b
   addCollection cw fg
-  
 
 fromButtonList :: String -> FrontEnd (String -> IO (), [String]) -> FrontEnd (IO ()) 
 fromButtonList t f = do
