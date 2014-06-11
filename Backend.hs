@@ -31,19 +31,28 @@ addBuyer :: String -> String -> DBTransaction ()
 addBuyer mail pass = runQuery "insert into kupujacy (mail) values (?);" [toSql mail]
 logAsBuyer :: Int -> String -> DBTransaction ()
 logAsBuyer i _ = runQuery "select * from zaloguj_jako_kupujacy(?);" [toSql i]
+listAllBuyers = liftDB (convertPrettifyAddHeader
+  ["id", "mail"]) $
+  query "select * from kupujacy;" []
 
 ---add new provider
 addProvider :: String -> String -> DBTransaction ()
 addProvider mail pass = runQuery "insert into dostawca (mail) values (?);" [toSql mail]
 logAsProvider :: Int -> String -> DBTransaction ()
 logAsProvider i _ = runQuery "select * from zaloguj_jako_dostawca(?);" [toSql i]
+listAllProviders = liftDB (convertPrettifyAddHeader
+  ["id", "mail"]) $
+  query "select * from dostawca;" []
 
 ---add new owner
-addOwner :: String -> Rational -> String -> DBTransaction ()
+addOwner :: String -> Double -> String -> DBTransaction ()
 addOwner mail markup pass = runQuery "insert into wlasciciel (mail,marza) values (?,?);" $
   [toSql mail, toSql markup]
 logAsOwner :: Int -> String -> DBTransaction ()
 logAsOwner i _ = runQuery "select * from zaloguj_jako_wlasciciel(?);" [toSql i]
+listAllOwners = liftDB (convertPrettifyAddHeader
+  ["id", "mail", "marza"]) $
+  query "select * from wlasciciel;" []
 
 resetRole = query "reset role;" []
 
@@ -65,7 +74,6 @@ ownerHistory own = liftDB (convertPrettifyAddHeader
    ["data_zlozenia", "data_realizacji", "wartosc", "kupujacy" ]) $ 
     query ( "select zlozenie, realizacja, wartosc, mail \
      \ from zamowienie join kupujacy using (kuid) where wlid = ?;") [toSql own]
-
 ---see particular order
 ownerOrderDetails :: AsOwner (
   Int -> DBTransaction [String] )
@@ -96,6 +104,11 @@ listProviders _ tp = liftDB (convertPrettifyAddHeader
  
 --Buyer
 type AsBuyer a = AsSomeone a
+---see his products
+myProducts :: AsBuyer ( DBTransaction [String])
+myProducts own = liftDB (convertPrettifyAddHeader
+  ["typ", "cena", "od kogo"]) $
+  query "select nazwa, cena, mail from produktu join dostawca using (doid) join typ_produktu using (tpid) where wlid = ?;" [toSql own]
 ---add new order
 addOrder :: AsBuyer ( Int -> DBTransaction () )
 addOrder buy own = runQuery "insert into zamowienie (kuid, wlid) values (?,?);" $ map toSql [buy, own]

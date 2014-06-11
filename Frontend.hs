@@ -23,7 +23,20 @@ main = runFrontEnd $ do
 adminScreen = fromButtonList "Admin" $ screenChooser
   [ ("Dodaj uzytkownika", addUserScreen),
     ("Stworz baze", createDataBase),
+    ("Zobacz kupujacych", listBuyerScreen),
+    ("Zobacz wlascicieli", listOwnerScreen),
+    ("Zobacz dostawcow", listProviderScreen),
     ("Usun histore", createDataBase) ]
+
+listProviderScreen = do
+  conn <- takeConn
+  listScreen (doNothing) $ ((listAllProviders `unDB` conn) >>= splitHeader)
+listOwnerScreen = do
+  conn <- takeConn
+  listScreen (doNothing) $ ((listAllOwners `unDB` conn) >>= splitHeader)
+listBuyerScreen = do
+  conn <- takeConn
+  listScreen (doNothing) $ ((listAllBuyers `unDB` conn) >>= splitHeader)
 
 loginScreen n log next = do
   fg <- simpleFocusGroup 
@@ -33,6 +46,7 @@ loginScreen n log next = do
   nextScreen <- next
   onErr <- errScreen
   errScreen <- infoScreen "ID powinno byc liczba!"
+  st <- takeStack
   ok <- makeButton ("Ok",
     do
       txt <- liftM T.unpack $ getEditText name
@@ -41,6 +55,8 @@ loginScreen n log next = do
         then errScreen
         else onErr `inThis` do
           (log (fromJust n) "" `unDB` conn) 
+          void $ popFromStack st
+          void $ popFromStack st
           nextScreen
     )
   tytul <- simpleText $ "Logowanie - " ++ n
@@ -74,7 +90,7 @@ addOwnerScreen = do
     do
       txt <- liftM T.unpack $ getEditText name
       mar <- liftM T.unpack $ getEditText marz
-      let n = floatFromString $ map (\a -> if a == '/' then '%' else a) mar
+      let n = floatFromString $ map (\a -> if a == ',' then '.' else a) mar
       if n == Nothing 
         then errScreen
         else onErr `inThis` do
@@ -113,6 +129,21 @@ addUserSimpleScreen n f = do
   cw <- liftIO $ (centered tytul) <--> (centered nGr) <--> (centered ok) <--> (centered back)
   addCollection cw fg
 
-buyerScreen = placeholder
-ownerScreen = placeholder
-providerScreen = placeholder
+buyerScreen = fromButtonList "Kupujacy" $ screenChooser
+  [ ( "Historia zamowien", placeholder),                -- > szczegoly zamowienia
+    ( "Zobacz produkty", placeholder ),                 -- > zobacz kto posiada -- > dodaj do zamowienia
+    ( "Zobacz sprzedawcow", placeholder ),              -- > dodaj zamowienie
+    ( "Zobacz niezlozone zamowienia", placeholder ) ]   -- > zloz zamowienie
+
+ownerScreen = fromButtonList "Wlasciciel" $ screenChooser
+  [ ( "Historia zamowien", placeholder),                -- > szczegly zamowienia
+    ( "Niezrealizowane zamowienia", placeholder),       -- > zrealizuj zamowienie
+    ( "Zobacz swoje produkty", placeholder),
+    ( "Dodaj produkt", placeholder),                    
+    ( "Zobacz dostepne produkty", placeholder) ]        -- > kto je dostarcza -> dodaj produkt
+
+providerScreen = fromButtonList "Dostawca" $ screenChooser
+  [ ( "Wspolpracownicy", placeholder),
+    ( "Co dostarczam", placeholder),                    -- > przestan dostarczac
+    ( "Typy produktow", placeholder),                   -- > zacznij dostarczac
+    ( "Dodaj nowy typ produktu", placeholder) ]

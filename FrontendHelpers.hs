@@ -23,8 +23,8 @@ intFromString str = case (readsPrec 0 str) :: [(Int, String)] of
   [] -> Nothing
   (i,_):_ -> Just i
   
-floatFromString :: String -> Maybe Rational
-floatFromString str = case (readsPrec 0 str) :: [(Rational, String)] of
+floatFromString :: String -> Maybe Double
+floatFromString str = case (readsPrec 0 str) :: [(Double, String)] of
   [] -> Nothing
   (i,_):_ -> Just i
   
