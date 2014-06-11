@@ -28,7 +28,8 @@ conn = ask
 
 unDB :: DBTransaction a -> Connection -> IO a
 unDB act c = do
-  v <- c `withTransaction` runReaderT act 
+  v <- c `withTransaction` runReaderT act
+--  commit c
   return v
 
 runTransaction :: DBTransaction a -> IO a

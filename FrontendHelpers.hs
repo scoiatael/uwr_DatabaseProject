@@ -23,6 +23,11 @@ intFromString str = case (readsPrec 0 str) :: [(Int, String)] of
   [] -> Nothing
   (i,_):_ -> Just i
   
+floatFromString :: String -> Maybe Rational
+floatFromString str = case (readsPrec 0 str) :: [(Rational, String)] of
+  [] -> Nothing
+  (i,_):_ -> Just i
+  
 catchSql :: IO a -> (SqlError -> IO a) -> IO a
 catchSql = catch
 goodByeScreen :: Collection -> SqlError -> IO ()

@@ -28,13 +28,13 @@ type AsSomeone a = Int -> a
 --Admin
 ---add new buyer
 addBuyer :: String -> String -> DBTransaction ()
-addBuyer mail pass = runQuery "insert into kupujacy (mail) values ?;" [toSql mail]
+addBuyer mail pass = runQuery "insert into kupujacy (mail) values (?);" [toSql mail]
 logAsBuyer :: Int -> String -> DBTransaction ()
 logAsBuyer i _ = runQuery "select * from zaloguj_jako_kupujacy(?);" [toSql i]
 
 ---add new provider
 addProvider :: String -> String -> DBTransaction ()
-addProvider mail pass = runQuery "insert into dostawca (mail) values ?;" [toSql mail]
+addProvider mail pass = runQuery "insert into dostawca (mail) values (?);" [toSql mail]
 logAsProvider :: Int -> String -> DBTransaction ()
 logAsProvider i _ = runQuery "select * from zaloguj_jako_dostawca(?);" [toSql i]
 
