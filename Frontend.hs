@@ -39,8 +39,8 @@ loginScreen n log next = do
       let n = intFromString txt
       if n == Nothing 
         then errScreen
-        else do
-          (log (fromJust n) "" `unDB` conn) `catchSql` onErr
+        else onErr `inThis` do
+          (log (fromJust n) "" `unDB` conn) 
           nextScreen
     )
   tytul <- simpleText $ "Logowanie - " ++ n
@@ -77,9 +77,9 @@ addOwnerScreen = do
       let n = floatFromString $ map (\a -> if a == '/' then '%' else a) mar
       if n == Nothing 
         then errScreen
-        else do
-          (addOwner txt (fromJust n) "" `unDB` conn) `catchSql` onErr
---          void $ popFromStack st
+        else onErr `inThis` do
+          (addOwner txt (fromJust n) "" `unDB` conn) 
+          void $ popFromStack st
           nextScreen
     )
   tytul <- simpleText $ "Dodawanie uzytkownika - wlasciciel"
@@ -99,10 +99,10 @@ addUserSimpleScreen n f = do
   nextScreen <- infoScreen "Dodano uzytkownika."
   st <- takeStack
   onErr <- errScreen
-  ok <- makeButton ("Ok",
+  ok <- makeButton ("Ok", onErr `inThis` 
     do
       txt <- liftM T.unpack $ getEditText name
-      (f txt "" `unDB` conn) `catchSql` onErr
+      (f txt "" `unDB` conn)
       void $ popFromStack st
       nextScreen
     )

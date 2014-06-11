@@ -30,6 +30,8 @@ floatFromString str = case (readsPrec 0 str) :: [(Rational, String)] of
   
 catchSql :: IO a -> (SqlError -> IO a) -> IO a
 catchSql = catch
+
+inThis = flip catchSql
 goodByeScreen :: Collection -> SqlError -> IO ()
 goodByeScreen c err = do
   wfg <- newFocusGroup
