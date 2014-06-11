@@ -21,18 +21,22 @@ liftDB = liftM
 conn :: DBTransaction Connection
 conn = ask
 
+unDB :: DBTransaction a -> Connection -> IO a
+unDB act c = do
+  v <- c `withTransaction` runReaderT act 
+  return v
+
 runTransaction :: DBTransaction a -> IO a
 runTransaction act = do
   c <- openDatabase
-  val <- (runReaderT act) c
-  commit c
+  val <- unDB act c
   err <- disconnect c
   return val
 
 runInTrans :: DBTransaction a -> DBTransaction (IO a)
 runInTrans act = do
   c <- ask
-  return $ runReaderT act c
+  return $ unDB act c
 
 withConn :: (Connection -> IO a) -> DBTransaction a
 withConn a = do
@@ -47,4 +51,5 @@ runQuery s v = withConn $ \c -> do
 query :: String -> [SqlValue] -> DBTransaction [[SqlValue]]
 query s v = withConn $ \c -> quickQuery' c s v
 
-  
+revert :: DBTransaction ()
+revert = withConn rollback
