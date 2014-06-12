@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+><head
+  ><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
+     /><title
+    >Backend</title
+    ><link href="ocean.css" rel="stylesheet" type="text/css" title="Ocean"
+     /><script src="haddock-util.js" type="text/javascript"
+    ></script
+    ><script type="text/javascript"
+    >//<![CDATA[
+window.onload = function () {pageLoad();};
+//]]>
+</script
+    ></head
+  ><body id="mini"
+  ><div id="module-header"
+    ><p class="caption"
+      >Backend</p
+      ></div
+    ><div id="interface"
+    ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:mFromSql" target="main"
+	  >mFromSql</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:convertPrettifyAddHeader" target="main"
+	  >convertPrettifyAddHeader</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:prettifyStringTable" target="main"
+	  >prettifyStringTable</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:prettifyStringList" target="main"
+	  >prettifyStringList</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:padTo" target="main"
+	  >padTo</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><span class="keyword"
+	  >type</span
+	  > <a href="Backend.html#t:AsSomeone" target="main"
+	  >AsSomeone</a
+	  > a</p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addBuyer" target="main"
+	  >addBuyer</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:logAsBuyer" target="main"
+	  >logAsBuyer</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:listAllBuyers" target="main"
+	  >listAllBuyers</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addProvider" target="main"
+	  >addProvider</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:logAsProvider" target="main"
+	  >logAsProvider</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:listAllProviders" target="main"
+	  >listAllProviders</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addOwner" target="main"
+	  >addOwner</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:logAsOwner" target="main"
+	  >logAsOwner</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:listAllOwners" target="main"
+	  >listAllOwners</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:resetRole" target="main"
+	  >resetRole</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><span class="keyword"
+	  >type</span
+	  > <a href="Backend.html#t:AsOwner" target="main"
+	  >AsOwner</a
+	  > a</p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addProduct" target="main"
+	  >addProduct</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:realizeOrder" target="main"
+	  >realizeOrder</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:ownerHistory" target="main"
+	  >ownerHistory</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:ownerOrderDetails" target="main"
+	  >ownerOrderDetails</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:ownerUnrealized" target="main"
+	  >ownerUnrealized</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:ownerAvailable" target="main"
+	  >ownerAvailable</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:ownerProvidersOf" target="main"
+	  >ownerProvidersOf</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><span class="keyword"
+	  >type</span
+	  > <a href="Backend.html#t:AsBuyer" target="main"
+	  >AsBuyer</a
+	  > a</p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addOrder" target="main"
+	  >addOrder</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addProductToOrder" target="main"
+	  >addProductToOrder</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:finishOrder" target="main"
+	  >finishOrder</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:buyerHistory" target="main"
+	  >buyerHistory</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:buyerOrderDetails" target="main"
+	  >buyerOrderDetails</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:buyerUnfinished" target="main"
+	  >buyerUnfinished</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:buyerOptions" target="main"
+	  >buyerOptions</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:whoHasX" target="main"
+	  >whoHasX</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:buyerOrdersOfOwner" target="main"
+	  >buyerOrdersOfOwner</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:buyerOwners" target="main"
+	  >buyerOwners</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><span class="keyword"
+	  >type</span
+	  > <a href="Backend.html#t:AsProvider" target="main"
+	  >AsProvider</a
+	  > a</p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addType" target="main"
+	  >addType</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:deleteType" target="main"
+	  >deleteType</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:addProvision" target="main"
+	  >addProvision</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:allTypes" target="main"
+	  >allTypes</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:listOwners" target="main"
+	  >listOwners</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:listProvisions" target="main"
+	  >listProvisions</a
+	  ></p
+	></div
+      ><div class="top"
+      ><p class="src"
+	><a href="Backend.html#v:runT" target="main"
+	  >runT</a
+	  ></p
+	></div
+      ></div
+    ></body
+  ></html
+>

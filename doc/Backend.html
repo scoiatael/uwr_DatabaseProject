@@ -1,0 +1,443 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+><head
+  ><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
+     /><title
+    >Backend</title
+    ><link href="ocean.css" rel="stylesheet" type="text/css" title="Ocean"
+     /><script src="haddock-util.js" type="text/javascript"
+    ></script
+    ><script type="text/javascript"
+    >//<![CDATA[
+window.onload = function () {pageLoad();setSynopsis("mini_Backend.html");};
+//]]>
+</script
+    ></head
+  ><body
+  ><div id="package-header"
+    ><ul class="links" id="page-menu"
+      ><li
+	><a href="index.html"
+	  >Contents</a
+	  ></li
+	><li
+	><a href="doc-index.html"
+	  >Index</a
+	  ></li
+	></ul
+      ><p class="caption empty"
+      >&nbsp;</p
+      ></div
+    ><div id="content"
+    ><div id="module-header"
+      ><table class="info"
+	><tr
+	  ><th
+	    >Safe Haskell</th
+	    ><td
+	    >None</td
+	    ></tr
+	  ></table
+	><p class="caption"
+	>Backend</p
+	></div
+      ><div id="interface"
+      ><h1
+	>Documentation</h1
+	><div class="top"
+	><p class="src"
+	  ><a name="v:mFromSql" class="def"
+	    >mFromSql</a
+	    > :: SqlValue -&gt; [Char]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:convertPrettifyAddHeader" class="def"
+	    >convertPrettifyAddHeader</a
+	    > :: [String] -&gt; [[SqlValue]] -&gt; [String]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:prettifyStringTable" class="def"
+	    >prettifyStringTable</a
+	    > :: [[String]] -&gt; [[String]]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:prettifyStringList" class="def"
+	    >prettifyStringList</a
+	    > :: (Int, [String]) -&gt; [String]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:padTo" class="def"
+	    >padTo</a
+	    > :: Int -&gt; String -&gt; String</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:AsSomeone" class="def"
+	    >AsSomeone</a
+	    > a = Int -&gt; a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addBuyer" class="def"
+	    >addBuyer</a
+	    > :: String -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:logAsBuyer" class="def"
+	    >logAsBuyer</a
+	    > :: Int -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:listAllBuyers" class="def"
+	    >listAllBuyers</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addProvider" class="def"
+	    >addProvider</a
+	    > :: String -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:logAsProvider" class="def"
+	    >logAsProvider</a
+	    > :: Int -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:listAllProviders" class="def"
+	    >listAllProviders</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addOwner" class="def"
+	    >addOwner</a
+	    > :: String -&gt; Double -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:logAsOwner" class="def"
+	    >logAsOwner</a
+	    > :: Int -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:listAllOwners" class="def"
+	    >listAllOwners</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:resetRole" class="def"
+	    >resetRole</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:AsOwner" class="def"
+	    >AsOwner</a
+	    > a = <a href="Backend.html#t:AsSomeone"
+	    >AsSomeone</a
+	    > a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addProduct" class="def"
+	    >addProduct</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (Int -&gt; Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:realizeOrder" class="def"
+	    >realizeOrder</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:ownerHistory" class="def"
+	    >ownerHistory</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:ownerOrderDetails" class="def"
+	    >ownerOrderDetails</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:ownerUnrealized" class="def"
+	    >ownerUnrealized</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:ownerAvailable" class="def"
+	    >ownerAvailable</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:ownerProvidersOf" class="def"
+	    >ownerProvidersOf</a
+	    > :: <a href="Backend.html#t:AsOwner"
+	    >AsOwner</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:AsBuyer" class="def"
+	    >AsBuyer</a
+	    > a = <a href="Backend.html#t:AsSomeone"
+	    >AsSomeone</a
+	    > a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addOrder" class="def"
+	    >addOrder</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addProductToOrder" class="def"
+	    >addProductToOrder</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (Int -&gt; Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:finishOrder" class="def"
+	    >finishOrder</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:buyerHistory" class="def"
+	    >buyerHistory</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:buyerOrderDetails" class="def"
+	    >buyerOrderDetails</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:buyerUnfinished" class="def"
+	    >buyerUnfinished</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:buyerOptions" class="def"
+	    >buyerOptions</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:whoHasX" class="def"
+	    >whoHasX</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:buyerOrdersOfOwner" class="def"
+	    >buyerOrdersOfOwner</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:buyerOwners" class="def"
+	    >buyerOwners</a
+	    > :: <a href="Backend.html#t:AsBuyer"
+	    >AsBuyer</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:AsProvider" class="def"
+	    >AsProvider</a
+	    > a = <a href="Backend.html#t:AsSomeone"
+	    >AsSomeone</a
+	    > a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addType" class="def"
+	    >addType</a
+	    > :: <a href="Backend.html#t:AsProvider"
+	    >AsProvider</a
+	    > (String -&gt; String -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:deleteType" class="def"
+	    >deleteType</a
+	    > :: <a href="Backend.html#t:AsProvider"
+	    >AsProvider</a
+	    > (Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addProvision" class="def"
+	    >addProvision</a
+	    > :: <a href="Backend.html#t:AsProvider"
+	    >AsProvider</a
+	    > (Int -&gt; Int -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:allTypes" class="def"
+	    >allTypes</a
+	    > :: <a href="Backend.html#t:AsProvider"
+	    >AsProvider</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:listOwners" class="def"
+	    >listOwners</a
+	    > :: <a href="Backend.html#t:AsProvider"
+	    >AsProvider</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:listProvisions" class="def"
+	    >listProvisions</a
+	    > :: <a href="Backend.html#t:AsProvider"
+	    >AsProvider</a
+	    > (<a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:runT" class="def"
+	    >runT</a
+	    > ::  <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a -&gt; IO a</p
+	  ></div
+	></div
+      ></div
+    ><div id="footer"
+    ><p
+      >Produced by <a href="http://www.haskell.org/haddock/"
+	>Haddock</a
+	> version 2.14.2</p
+      ></div
+    ></body
+  ></html
+>

@@ -1,0 +1,419 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+><head
+  ><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
+     /><title
+    >FrontendHelpers</title
+    ><link href="ocean.css" rel="stylesheet" type="text/css" title="Ocean"
+     /><script src="haddock-util.js" type="text/javascript"
+    ></script
+    ><script type="text/javascript"
+    >//<![CDATA[
+window.onload = function () {pageLoad();setSynopsis("mini_FrontendHelpers.html");};
+//]]>
+</script
+    ></head
+  ><body
+  ><div id="package-header"
+    ><ul class="links" id="page-menu"
+      ><li
+	><a href="index.html"
+	  >Contents</a
+	  ></li
+	><li
+	><a href="doc-index.html"
+	  >Index</a
+	  ></li
+	></ul
+      ><p class="caption empty"
+      >&nbsp;</p
+      ></div
+    ><div id="content"
+    ><div id="module-header"
+      ><table class="info"
+	><tr
+	  ><th
+	    >Safe Haskell</th
+	    ><td
+	    >None</td
+	    ></tr
+	  ></table
+	><p class="caption"
+	>FrontendHelpers</p
+	></div
+      ><div id="interface"
+      ><h1
+	>Documentation</h1
+	><div class="top"
+	><p class="src"
+	  ><a name="v:intFromString" class="def"
+	    >intFromString</a
+	    > :: String -&gt; Maybe Int</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:floatFromString" class="def"
+	    >floatFromString</a
+	    > :: String -&gt; Maybe Double</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:catchSql" class="def"
+	    >catchSql</a
+	    > ::  IO a -&gt; (SqlError -&gt; IO a) -&gt; IO a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:inThis" class="def"
+	    >inThis</a
+	    > ::  (SqlError -&gt; IO a) -&gt; IO a -&gt; IO a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:goodByeScreen" class="def"
+	    >goodByeScreen</a
+	    > :: Collection -&gt; SqlError -&gt; IO ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:FrontEnd" class="def"
+	    >FrontEnd</a
+	    > a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:runFrontEnd" class="def"
+	    >runFrontEnd</a
+	    > ::  <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > a -&gt; IO ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:runInIO" class="def"
+	    >runInIO</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > () -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeConn" class="def"
+	    >takeConn</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > Connection</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:errScreen" class="def"
+	    >errScreen</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (SqlError -&gt; IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:fst5" class="def"
+	    >fst5</a
+	    > ::  (t, t1, t2, t3, t4) -&gt; t</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:snd5" class="def"
+	    >snd5</a
+	    > ::  (t, t1, t2, t3, t4) -&gt; t1</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:thr5" class="def"
+	    >thr5</a
+	    > ::  (t, t1, t2, t3, t4) -&gt; t2</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:frt5" class="def"
+	    >frt5</a
+	    > ::  (t, t1, t2, t3, t4) -&gt; t3</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:fft5" class="def"
+	    >fft5</a
+	    > ::  (t, t1, t2, t3, t4) -&gt; t4</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addCollection" class="def"
+	    >addCollection</a
+	    > :: Show a =&gt; Widget a -&gt; Widget FocusGroup -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeCollection" class="def"
+	    >takeCollection</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > Collection</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeStack" class="def"
+	    >takeStack</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (MVar [IO ()])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeRo" class="def"
+	    >takeRo</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (MVar Int)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeRoInt" class="def"
+	    >takeRoInt</a
+	    > :: ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > Int</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeTp" class="def"
+	    >takeTp</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (MVar Int)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeTpInt" class="def"
+	    >takeTpInt</a
+	    > :: ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > Int</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takePr" class="def"
+	    >takePr</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (MVar Int)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takePrInt" class="def"
+	    >takePrInt</a
+	    > :: ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > Int</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:pushInt" class="def"
+	    >pushInt</a
+	    > :: MVar Int -&gt; Int -&gt; IO ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:takeInt" class="def"
+	    >takeInt</a
+	    > ::  MVar b -&gt; IO b</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:pushToStack" class="def"
+	    >pushToStack</a
+	    > :: MVar [IO ()] -&gt; IO () -&gt; IO ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:popFromStack" class="def"
+	    >popFromStack</a
+	    > :: MVar [IO ()] -&gt; IO (Maybe (IO ()))</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:makeButton" class="def"
+	    >makeButton</a
+	    > :: MonadIO m =&gt; (String, IO ()) -&gt; m (Widget Padded)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:safeUnCon" class="def"
+	    >safeUnCon</a
+	    > ::  [a] -&gt; ([a], Maybe a)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:safeBack" class="def"
+	    >safeBack</a
+	    > :: Maybe (IO ()) -&gt; IO ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:backButton" class="def"
+	    >backButton</a
+	    > :: ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > (Widget Padded)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:simpleFocusGroup" class="def"
+	    >simpleFocusGroup</a
+	    > :: ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > (Widget FocusGroup)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:simpleText" class="def"
+	    >simpleText</a
+	    > :: MonadIO m =&gt; [Char] -&gt; m (Widget (VFixed (HFixed (VCentered (HCentered FormattedText)))))</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:infoScreen" class="def"
+	    >infoScreen</a
+	    > :: String -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:fixToWidth" class="def"
+	    >fixToWidth</a
+	    > :: Int -&gt; [Char] -&gt; [Char]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:fromButtonList" class="def"
+	    >fromButtonList</a
+	    > :: String -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (String -&gt; IO (), [String]) -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addWidgetToFG" class="def"
+	    >addWidgetToFG</a
+	    > :: (MonadIO m, Show a) =&gt; Widget FocusGroup -&gt; Widget a -&gt; m (Widget FocusEntry)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:listScreen" class="def"
+	    >listScreen</a
+	    > :: String -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (String -&gt; IO ()) -&gt; IO (String, [String]) -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:doNothing" class="def"
+	    >doNothing</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (String -&gt; IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:setMVarAndGoto" class="def"
+	    >setMVarAndGoto</a
+	    > :: Monad m =&gt; MVar Int -&gt; m (IO b) -&gt; m (String -&gt; IO b)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:splitHeader" class="def"
+	    >splitHeader</a
+	    > :: [String] -&gt; IO (String, [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addHeader" class="def"
+	    >addHeader</a
+	    > ::  (a -&gt; String) -&gt; String -&gt; [a] -&gt; IO (String, [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:addText" class="def"
+	    >addText</a
+	    > :: (MonadIO m, Show a) =&gt; [Char] -&gt; Widget a -&gt; m (Widget (Box (VCentered (HCentered (VFixed (HFixed (VCentered (HCentered FormattedText)))))) (VCentered (HCentered a))))</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:createEditLineAddFG" class="def"
+	    >createEditLineAddFG</a
+	    > :: MonadIO m =&gt; Widget FocusGroup -&gt; m (Widget Edit)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:createEditMultiLineAddFG" class="def"
+	    >createEditMultiLineAddFG</a
+	    > :: MonadIO m =&gt; Widget FocusGroup -&gt; m (Widget Edit)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:blank" class="def"
+	    >blank</a
+	    > :: Monad m =&gt; m a -&gt; m (t -&gt; a)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:placeholder" class="def"
+	    >placeholder</a
+	    > :: <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:chooser" class="def"
+	    >chooser</a
+	    > :: [(String, IO ())] -&gt; String -&gt; IO ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:screenChooser" class="def"
+	    >screenChooser</a
+	    > :: [(String, <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ()))] -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (String -&gt; IO (), [String])</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:confirmationScreen" class="def"
+	    >confirmationScreen</a
+	    > ::  [Char] -&gt; String -&gt; (MVar Int -&gt; MVar Int -&gt; MVar Int -&gt; Connection -&gt; MVar [IO ()] -&gt; IO a) -&gt; <a href="FrontendHelpers.html#t:FrontEnd"
+	    >FrontEnd</a
+	    > (IO ())</p
+	  ></div
+	></div
+      ></div
+    ><div id="footer"
+    ><p
+      >Produced by <a href="http://www.haskell.org/haddock/"
+	>Haddock</a
+	> version 2.14.2</p
+      ></div
+    ></body
+  ></html
+>

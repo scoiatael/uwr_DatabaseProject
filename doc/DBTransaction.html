@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+><head
+  ><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"
+     /><title
+    >DBTransaction</title
+    ><link href="ocean.css" rel="stylesheet" type="text/css" title="Ocean"
+     /><script src="haddock-util.js" type="text/javascript"
+    ></script
+    ><script type="text/javascript"
+    >//<![CDATA[
+window.onload = function () {pageLoad();setSynopsis("mini_DBTransaction.html");};
+//]]>
+</script
+    ></head
+  ><body
+  ><div id="package-header"
+    ><ul class="links" id="page-menu"
+      ><li
+	><a href="index.html"
+	  >Contents</a
+	  ></li
+	><li
+	><a href="doc-index.html"
+	  >Index</a
+	  ></li
+	></ul
+      ><p class="caption empty"
+      >&nbsp;</p
+      ></div
+    ><div id="content"
+    ><div id="module-header"
+      ><table class="info"
+	><tr
+	  ><th
+	    >Safe Haskell</th
+	    ><td
+	    >None</td
+	    ></tr
+	  ></table
+	><p class="caption"
+	>DBTransaction</p
+	></div
+      ><div id="interface"
+      ><h1
+	>Documentation</h1
+	><div class="top"
+	><p class="src"
+	  ><a name="v:databaseName" class="def"
+	    >databaseName</a
+	    > :: [Char]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:adminName" class="def"
+	    >adminName</a
+	    > :: [Char]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:baseName" class="def"
+	    >baseName</a
+	    > :: [Char]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:openOptions" class="def"
+	    >openOptions</a
+	    > :: [Char]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:openDatabase" class="def"
+	    >openDatabase</a
+	    > :: IO Connection</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:DBTransactionT" class="def"
+	    >DBTransactionT</a
+	    > = ReaderT Connection</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><span class="keyword"
+	    >type</span
+	    > <a name="t:DBTransaction" class="def"
+	    >DBTransaction</a
+	    > = <a href="DBTransaction.html#t:DBTransactionT"
+	    >DBTransactionT</a
+	    > IO</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:liftDB" class="def"
+	    >liftDB</a
+	    > ::  (a -&gt; b) -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > b</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:conn" class="def"
+	    >conn</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > Connection</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:unDB" class="def"
+	    >unDB</a
+	    > ::  <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a -&gt; Connection -&gt; IO a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:runTransaction" class="def"
+	    >runTransaction</a
+	    > ::  <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a -&gt; IO a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:runInTrans" class="def"
+	    >runInTrans</a
+	    > ::  <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > (IO a)</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:withConn" class="def"
+	    >withConn</a
+	    > ::  (Connection -&gt; IO a) -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > a</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:runQuery" class="def"
+	    >runQuery</a
+	    > :: String -&gt; [SqlValue] -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:query" class="def"
+	    >query</a
+	    > :: String -&gt; [SqlValue] -&gt; <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > [[SqlValue]]</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:revert" class="def"
+	    >revert</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	><div class="top"
+	><p class="src"
+	  ><a name="v:resetDatabase" class="def"
+	    >resetDatabase</a
+	    > :: <a href="DBTransaction.html#t:DBTransaction"
+	    >DBTransaction</a
+	    > ()</p
+	  ></div
+	></div
+      ></div
+    ><div id="footer"
+    ><p
+      >Produced by <a href="http://www.haskell.org/haddock/"
+	>Haddock</a
+	> version 2.14.2</p
+      ></div
+    ></body
+  ></html
+>
