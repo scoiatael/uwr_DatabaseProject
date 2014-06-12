@@ -98,34 +98,33 @@ addCollection w wfg = do
   a <- liftIO $ addToCollection (fst5 c) w wfg
   return $ (pushToStack (snd5 c) a >> a)
 
+takeCollection :: FrontEnd Collection
+takeCollection = do
+  c <- ask
+  return $ fst5 c
+
 takeStack :: FrontEnd (MVar [IO ()])
 takeStack = do
   c <- ask
   return $ snd5 c
 
-takeTp :: FrontEnd (MVar Int)
-takeTp = do
-  c <- ask
-  return $ thr5 c
-  return $ frt5 c
-takeTpInt = takeTp >>= (\m -> liftIO $ takeInt m)
-
 takeRo :: FrontEnd (MVar Int)
 takeRo = do
   c <- ask
-  return $ frt5 c
+  return $ thr5 c
 takeRoInt = takeRo >>= (\m -> liftIO $ takeInt m)
+
+takeTp :: FrontEnd (MVar Int)
+takeTp = do
+  c <- ask
+  return $ frt5 c
+takeTpInt = takeTp >>= (\m -> liftIO $ takeInt m)
 
 takePr :: FrontEnd (MVar Int)
 takePr = do
   c <- ask
   return $ fft5 c
 takePrInt = takePr >>= (\m -> liftIO $ takeInt m)
-
-takeCollection :: FrontEnd Collection
-takeCollection = do
-  c <- ask
-  return $ fst5 c
 
 pushInt :: MVar Int -> Int -> IO ()
 pushInt mv i = modifyMVar_ mv (\a -> return i)

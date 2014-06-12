@@ -228,13 +228,14 @@ buyerOwnerScreen = runInIO $ do
   a <- listScreen "Dodaj zamowienie do wlasciciela" (setMVarAndGoto tp buyerAddOrderScreen) $ ((buyerOwners kuid `unDB` conn) >>= splitHeader)
   liftIO a
 
-buyerAddOrderScreen = confirmationScreen "Dodac zamowienie do tego sprzedajacego?" "Dodano zamowienie" $ \ku tp pr conn st -> 
-  do
-    kuid <- takeInt ku
-    wlid <- takeInt tp
-    (addOrder kuid wlid `unDB` conn)
-    void $ popFromStack st
-    void $ popFromStack st
+buyerAddOrderScreen = confirmationScreen "Dodac zamowienie do tego sprzedajacego?" "Dodano zamowienie" $ 
+  \ku tp pr conn st -> 
+    do
+      kuid <- takeInt ku
+      wlid <- takeInt tp
+      (addOrder kuid wlid `unDB` conn)
+      void $ popFromStack st
+      void $ popFromStack st
     
 buyerUnfinishedOrdScreen = runInIO $ do 
   conn <- takeConn

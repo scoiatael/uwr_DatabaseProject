@@ -71,8 +71,8 @@ realizeOrder own ord = runQuery "select * from wykonaj_zamowienie_jako(?,?);" $ 
 ownerHistory :: AsOwner (
   DBTransaction [String] )
 ownerHistory own = liftDB (convertPrettifyAddHeader 
-   ["data_zlozenia", "data_realizacji", "wartosc", "kupujacy" ]) $ 
-    query ( "select zlozenie, realizacja, wartosc, mail \
+   ["id", "data_zlozenia", "data_realizacji", "wartosc", "kupujacy" ]) $ 
+    query ( "select zaid, zlozenie, realizacja, wartosc, mail \
      \ from zamowienie join kupujacy using (kuid) where wlid = ?;") [toSql own]
 ---see particular order
 ownerOrderDetails :: AsOwner (
@@ -85,8 +85,8 @@ ownerOrderDetails own ord = liftDB (convertPrettifyAddHeader
 ownerUnrealized :: AsOwner ( 
   DBTransaction [String] )
 ownerUnrealized own = liftDB (convertPrettifyAddHeader 
-   ["data_zlozenia", "wartosc", "kupujacy" ]) $ 
-    query ( "select zlozenie, wartosc, mail \ 
+   ["id","data_zlozenia", "wartosc", "kupujacy" ]) $ 
+    query ( "select zaid,zlozenie, wartosc, mail \ 
     \ from zamowienie join kupujacy using (kuid) \
      \ where wlid = ? and realizacja is null and zlozenie is not null;") [toSql own]
 ---see all types of products that can be provided
@@ -100,8 +100,8 @@ ownerAvailable wlid = liftDB (convertPrettifyAddHeader
 ownerProvidersOf :: AsOwner (
   Int -> DBTransaction [String] )
 ownerProvidersOf _ tp = liftDB (convertPrettifyAddHeader 
-   ["cena", "dostawca"]) $ 
-    query "select cena, mail from dostarcza join dostawca using (doid) where tpid = ?;" [toSql tp]
+   ["id", "cena", "dostawca"]) $ 
+    query "select doid, cena, mail from dostarcza join dostawca using (doid) where tpid = ?;" [toSql tp]
 ---
  
 --Buyer
@@ -131,8 +131,8 @@ buyerOrderDetails buy ord = liftDB (convertPrettifyAddHeader
 ---list all unfinished orders
 buyerUnfinished :: AsBuyer ( DBTransaction [String] )
 buyerUnfinished buy = liftDB (convertPrettifyAddHeader 
-   ["data_zlozenia", "wartosc", "sprzedajacy"]) $ 
-    query ("select wartosc, mail \ 
+   ["id", "wartosc", "sprzedajacy"]) $ 
+    query ("select zaid, wartosc, mail \ 
     \ from zamowienie join wlasciciel using (wlid) where kuid = ? and zlozenie is null;") [toSql buy]
 ---list all products that can be added
 buyerOptions :: AsBuyer ( DBTransaction [String] )
@@ -179,7 +179,7 @@ allTypes :: AsProvider ( DBTransaction [String] )
 allTypes a = liftDB (convertPrettifyAddHeader 
   ["id", "nazwa", "opis", "dostarczam"]) $
     query "select tpid, nazwa, opis, count(cena) from typ_produktu left outer join \
-    \ dostarcza using (doid) group by tpid, nazwa, opis where doid = ?;" [toSql a]
+    \ dostarcza using (doid) where doid = ? group by tpid, nazwa, opis;" [toSql a]
 ---see all owners he provided for
 listOwners :: AsProvider ( DBTransaction [String] )
 listOwners pro = liftDB (convertPrettifyAddHeader

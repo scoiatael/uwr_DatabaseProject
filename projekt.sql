@@ -211,7 +211,7 @@ drop role if exists provider;
 create role provider;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from provider cascade;
 grant insert, update on typ_produktu, dostarcza to provider;
-grant select on dostarcza, typ_produktu to provider;
+grant select on dostarcza, typ_produktu, produkt to provider;
 grant select on wlasciciel to provider;
 grant delete on dostarcza to provider;
 grant all on zaid_seq,doid_seq,wlid_seq to provider;
