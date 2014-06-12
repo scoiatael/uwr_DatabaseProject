@@ -1,0 +1,115 @@
+
+% Podstawowe definicje dla wszystkich dokumentów
+
+\documentclass[12pt]{mwart}
+%\setlength{\textwidth}{83pt}
+
+\usepackage[OT4,plmath]{polski}
+\usepackage{amsmath,amssymb,amsfonts,amsthm,mathtools}
+\usepackage{color}
+\usepackage{fontspec}
+\usepackage{listings,times}
+
+\usepackage{bbm}
+\usepackage[colorlinks=false]{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+
+\graphicspath{{images/}}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\newcommand{\term}[1]{
+  \indent\textbf{#1}
+  \vspace{5pt}
+}
+
+\usepackage{multicol}
+
+\usepackage{capt-of}
+
+\usepackage{lmodern} \normalfont
+%\DeclareFontShape{EU1}{ptm}{bx}{n} { <-> ssub * cmr/bx/n }{}
+%\DeclareFontShape{EU1}{ptm}{m}{sc} { <-> ssub * cmr/m/sc }{}
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\fancyhead{}
+%\fancyhead[LE,LO]{Iron Coach. \doctitle}
+%\fancyhead[RO,RE]{\rightmark}
+%\fancyfoot{}
+%\fancyfoot[LE,RO]{}
+%\fancyfoot[CO,CE]{\thepage}
+%\addtolength{\headheight}{1.5pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+\linepenalty=1000
+\hyphenpenalty=10000
+\raggedbottom
+
+\renewcommand{\labelitemi}{}
+\renewcommand{\labelitemii}{}
+\renewcommand{\labelitemiii}{}
+\renewcommand{\labelitemiv}{}
+
+\newcommand{\titlep}[2] {
+  \newcommand{\doctitle}{#1}
+  \thispagestyle{empty}
+  \begin{titlepage}
+    \begin{center}
+      \textsc{Studencka Pracownia Baz Danych}\\[0.5cm]
+      \textsc{\large Instytut Informatyki\\Uniwersytetu Wrocławskiego}\\[1.5cm]
+
+
+      \vspace{3.5cm}
+
+      % Author and supervisor
+      \begin{minipage}{\textwidth}
+        \begin{center} \large
+          Łukasz \textsc{Czapliński}
+        \end{center}
+      \end{minipage}
+
+      \vspace{0.5cm}
+
+
+
+      % Title
+      \HRule \\[0.4cm]
+      { \Large Dokumentacja projektu \\[0.5cm] }
+      { \Huge \bfseries Iron Coach  \\[1cm] }
+
+      \textsc{\Large #1\\\large Wersja #2}\\[0.5cm]
+
+      \HRule \\[1.5cm]
+
+      \vspace{1cm}
+
+      
+      \vfill
+      
+
+      \vspace{1cm}
+
+      % Bottom of the page
+      {\large Wrocław 2014}
+
+    \end{center}
+  \end{titlepage}
+  \clearpage
+  \setcounter{page}{2}
+}
+
+\newcommand{\chist}[1]{
+  \begin{table}
+  \centering
+  \caption{Historia zmian}
+  \begin{tabular}{l | l | p{5cm} | p{5cm}}
+    Wersja & Data & Opis & Autor \\ 
+    \hline
+    \noalign{\smallskip}
+    #1
+  \end{tabular}
+\end{table}
+}
