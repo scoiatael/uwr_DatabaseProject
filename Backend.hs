@@ -104,11 +104,6 @@ listProviders _ tp = liftDB (convertPrettifyAddHeader
  
 --Buyer
 type AsBuyer a = AsSomeone a
----see his products
-myProducts :: AsBuyer ( DBTransaction [String])
-myProducts own = liftDB (convertPrettifyAddHeader
-  ["typ", "cena", "od kogo"]) $
-  query "select nazwa, cena, mail from produktu join dostawca using (doid) join typ_produktu using (tpid) where wlid = ?;" [toSql own]
 ---add new order
 addOrder :: AsBuyer ( Int -> DBTransaction () )
 addOrder buy own = runQuery "insert into zamowienie (kuid, wlid) values (?,?);" $ map toSql [buy, own]
@@ -122,8 +117,8 @@ finishOrder buy ord = runQuery "select * from zloz_zamowienie_jako(?,?);" $ map 
 ---see history (orders)
 buyerHistory :: AsBuyer ( DBTransaction [String] )
 buyerHistory buy = liftDB (convertPrettifyAddHeader 
-   ["data_zlozenia", "data_realizacji", "wartosc", "sprzedajacy"]) $ 
-    query ("select zlozenie, realizacja, wartosc, mail \
+   ["id", "data_zlozenia", "data_realizacji", "wartosc", "sprzedajacy"]) $ 
+    query ("select zaid, zlozenie, realizacja, wartosc, mail \
     \ from zamowienie join wlasciciel using (wlid) where kuid = ?;") [toSql buy]
 --see details of order
 buyerOrderDetails :: AsBuyer ( Int -> DBTransaction [String])
@@ -137,22 +132,22 @@ buyerUnfinished buy = liftDB (convertPrettifyAddHeader
    ["data_zlozenia", "wartosc", "sprzedajacy"]) $ 
     query ("select wartosc, mail \ 
     \ from zamowienie join wlasciciel using (wlid) where kuid = ? and zlozenie is null;") [toSql buy]
----list all products that can be added to given order
-buyerOptions :: AsBuyer ( Int -> DBTransaction [String] )
-buyerOptions _ ord = liftDB (convertPrettifyAddHeader 
-   ["nazwa", "opis"]) $ 
-    query ("select nazwa, opis from typ_produktu join \ 
-    \ (select * from produkt join \ 
-     \ (select wlid from zamowienie where zaid = ?) X \ 
-      \ using (wlid) where zaid is null) Y using (tpid);") [toSql ord]
----see all types of products
-buyerAllTypes :: AsBuyer ( DBTransaction [String] )
-buyerAllTypes a = ownerAvailible a
+---list all products that can be added
+buyerOptions :: AsBuyer ( DBTransaction [String] )
+buyerOptions _ = liftDB (convertPrettifyAddHeader 
+   ["id","nazwa", "opis"]) $ 
+    query "select tpid,nazwa,opis from produkt join typ_produktu using (tpid) \
+    \  where zaid is null;" [] 
 ---see which owner has given product type
 whoHasX :: AsBuyer ( Int -> DBTransaction [String] )
 whoHasX _ tp = liftDB (convertPrettifyAddHeader 
-   ["cena", "kontakt"]) $ 
-    query "select cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;" [toSql tp]
+   ["id", "cena", "kontakt"]) $ 
+    query "select wlid, cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;" [toSql tp]
+---see to which order can given product be added
+buyerOrdersOfOwner :: AsBuyer ( Int -> DBTransaction [String])
+buyerOrdersOfOwner buy pr = liftDB (convertPrettifyAddHeader 
+  ["id", "" ]) $
+    query "select zaid, wartosc from zamowienie join prid using (wlid) where zlozenie is null and kuid = ?;" [toSql buy]
 
 --Provider
 type AsProvider a = AsSomeone a

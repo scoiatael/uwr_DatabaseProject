@@ -14,7 +14,7 @@ drop sequence if exists kuid_seq cascade;
 create sequence kuid_seq;
 create table kupujacy (
   kuid integer primary key default nextval('kuid_seq'),
-  mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)')
+  mail text unique check (mail ~ '(([a-z]|[._,-]|\d)+)@(([a-z]|[_,-]|\d)+)\.(com|org|pl|fm)')
 );
 
 drop table if exists wlasciciel cascade;
@@ -23,7 +23,7 @@ drop sequence if exists wlid_seq cascade;
 create sequence wlid_seq;
 create table wlasciciel (
   wlid integer primary key default nextval('wlid_seq'),
-  mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)'),
+  mail text unique check (mail ~ '(([a-z]|[._,-]|\d)+)@(([a-z]|[_,-]|\d)+)\.(com|org|pl|fm)'),
   marza decimal(3,2) not null check ( marza < 1 and marza > 0)
 );
 
@@ -46,7 +46,7 @@ drop sequence if exists doid_seq cascade;
 create sequence doid_seq;
 create table dostawca (
   doid integer primary key default nextval('doid_seq'),
-  mail text check (mail ~ '([a-z]|[._,-])+@[a-z]+\.(com|org|pl|fm)')
+  mail text unique check (mail ~ '(([a-z]|[._,-]|\d)+)@(([a-z]|[_,-]|\d)+)\.(com|org|pl|fm)')
 );
 
 drop table if exists produkt cascade;
@@ -201,7 +201,7 @@ create role buyer;
 revoke all on produkt, zamowienie, dostarcza, typ_produktu, dostawca, kupujacy, wlasciciel from buyer cascade;
 grant update on produkt to buyer;
 grant insert, update on zamowienie to buyer;
-grant select on produkt, typ_produktu to buyer;
+grant select on produkt, typ_produktu,zamowienie to buyer;
 grant select on wlasciciel to buyer;
 
 drop role if exists provider;

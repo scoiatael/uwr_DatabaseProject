@@ -47,6 +47,7 @@ loginScreen n log next = do
   onErr <- errScreen
   errScreen <- infoScreen "ID powinno byc liczba!"
   st <- takeStack
+  ro <- takeRo
   ok <- makeButton ("Ok",
     do
       txt <- liftM T.unpack $ getEditText name
@@ -57,6 +58,7 @@ loginScreen n log next = do
           (log (fromJust n) "" `unDB` conn) 
           void $ popFromStack st
           void $ popFromStack st
+          pushInt ro $ fromJust n
           nextScreen
     )
   tytul <- simpleText $ "Logowanie - " ++ n
@@ -130,10 +132,76 @@ addUserSimpleScreen n f = do
   addCollection cw fg
 
 buyerScreen = fromButtonList "Kupujacy" $ screenChooser
-  [ ( "Historia zamowien", placeholder),                -- > szczegoly zamowienia
-    ( "Zobacz produkty", placeholder ),                 -- > zobacz kto posiada -- > dodaj do zamowienia
+  [ ( "Historia zamowien", buyerHistoryScreen),                -- > szczegoly zamowienia
+    ( "Zobacz produkty", buyerProductScreen ),                 -- > zobacz kto posiada -- > dodaj do zamowienia
     ( "Zobacz sprzedawcow", placeholder ),              -- > dodaj zamowienie
     ( "Zobacz niezlozone zamowienia", placeholder ) ]   -- > zloz zamowienie
+
+buyerHistoryScreen = runInIO $ do
+  conn <- takeConn
+  rN <- takeRoInt
+  tp <- takeTp 
+  a <- listScreen (setMVarAndGoto tp buyerOrderDetailsScreen) $ ((buyerHistory rN `unDB` conn) >>= splitHeader)
+  liftIO a
+
+buyerOrderDetailsScreen = runInIO $ do
+  conn <- takeConn
+  kuid <- takeRoInt
+  zaid <- takeTpInt
+  a <- listScreen (doNothing) $ ((buyerOrderDetails kuid zaid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+buyerProductScreen = runInIO $ do
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp 
+  a <- listScreen (setMVarAndGoto tp buyerSeeOwnerOfScreen) $ ((buyerOptions kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+buyerSeeOwnerOfScreen = runInIO $ do
+  conn <- takeConn
+  kuid <- takeRoInt
+  tpid <- takeTpInt 
+  pr <- takePr
+  a <- listScreen (setMVarAndGoto pr buyerOrderScreen) $ ((whoHasX kuid tpid `unDB` conn) >>= splitHeader)
+  liftIO a
+  
+buyerOrderScreen = runInIO $ do
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp 
+  prid <- takePrInt
+  a <- listScreen (setMVarAndGoto tp buyerAddToOrderScreen) $ ((buyerOrdersOfOwner kuid prid `unDB` conn) >>= splitHeader)
+  liftIO a
+  
+buyerAddToOrderScreen = runInIO $ do
+  conn <- takeConn
+  kuid <- takeRoInt
+  zaid <- takeTpInt
+  prid <- takePrInt 
+  st <- takeStack
+  conn <- takeConn
+ 
+  nextScreen <- infoScreen "Dodano do zamowienia." 
+  catchErr <- errScreen
+  ok <- makeButton ("Ok", catchErr `inThis` 
+    do
+      (addProductToOrder kuid zaid prid `unDB` conn)
+      void $ popFromStack st
+      void $ popFromStack st
+      void $ popFromStack st
+      nextScreen
+    )
+  b <- backButton
+  tytul <- simpleText "Czy chcesz dodac do tego zamowienia?"
+  fg <- simpleFocusGroup
+  addWidgetToFG fg ok
+  addWidgetToFG fg b
+     
+  cw <- liftIO $ (centered tytul) <--> (centered ok) <--> (centered b)
+  a <- addCollection cw fg
+  liftIO a 
+  
 
 ownerScreen = fromButtonList "Wlasciciel" $ screenChooser
   [ ( "Historia zamowien", placeholder),                -- > szczegly zamowienia

@@ -48,14 +48,15 @@ goodByeScreen c err = do
   a <- addToCollection c w wfg
   a
     
-type FrontEnd a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int) DBTransaction a
+type FrontEnd a = ReaderT (Collection, MVar [IO ()], MVar Int, MVar Int, MVar Int) DBTransaction a
 runFrontEnd :: FrontEnd a -> IO ()
 runFrontEnd act = do
   c <- newCollection
   m <- newMVar []
   i1 <- newMVar (-1)
   i2 <- newMVar (-1)
-  (flip catchSql) (goodByeScreen c) $ void $ runTransaction $ runReaderT act (c,m, i1, i2) 
+  i3 <- newMVar (-1)
+  (flip catchSql) (goodByeScreen c) $ void $ runTransaction $ runReaderT act (c,m, i1, i2, i3) 
   runUi c defaultContext
 
 runInIO :: FrontEnd () -> FrontEnd (IO ())
@@ -75,7 +76,7 @@ errScreen = do
   fg `addWidgetToFG` b
   cb <- liftIO $ centered b
   all <- ask
-  let c = fst4 all
+  let c = fst5 all
   return $ \err -> do
     let t = "Error occured:\n" ++ seErrorMsg err
     let width = length t
@@ -85,36 +86,46 @@ errScreen = do
     a <- addToCollection c w fg
     a
 
-fst4 (a,_,_,_) = a
-snd4 (_,b,_,_) = b
-thr4 (_,_,c,_) = c
-fth4 (_,_,_,d) = d
+fst5 (a,_,_,_,_) = a
+snd5 (_,b,_,_,_) = b
+thr5 (_,_,c,_,_) = c
+frt5 (_,_,_,d,_) = d
+fft5 (_,_,_,_,e) = e
 
 addCollection :: Show a => Widget a -> Widget FocusGroup -> FrontEnd (IO ())
 addCollection w wfg = do
   c <- ask
-  a <- liftIO $ addToCollection (fst4 c) w wfg
-  return $ (pushToStack (snd4 c) a >> a)
+  a <- liftIO $ addToCollection (fst5 c) w wfg
+  return $ (pushToStack (snd5 c) a >> a)
 
 takeStack :: FrontEnd (MVar [IO ()])
 takeStack = do
   c <- ask
-  return $ snd4 c
+  return $ snd5 c
 
-takeIDU :: FrontEnd (MVar Int)
-takeIDU = do
+takeTp :: FrontEnd (MVar Int)
+takeTp = do
   c <- ask
-  return $ thr4 c
+  return $ thr5 c
+  return $ frt5 c
+takeTpInt = takeTp >>= (\m -> liftIO $ takeInt m)
 
-takeIDZ :: FrontEnd (MVar Int)
-takeIDZ = do
+takeRo :: FrontEnd (MVar Int)
+takeRo = do
   c <- ask
-  return $ fth4 c
+  return $ frt5 c
+takeRoInt = takeRo >>= (\m -> liftIO $ takeInt m)
+
+takePr :: FrontEnd (MVar Int)
+takePr = do
+  c <- ask
+  return $ fft5 c
+takePrInt = takePr >>= (\m -> liftIO $ takeInt m)
 
 takeCollection :: FrontEnd Collection
 takeCollection = do
   c <- ask
-  return $ fst4 c
+  return $ fst5 c
 
 pushInt :: MVar Int -> Int -> IO ()
 pushInt mv i = modifyMVar_ mv (\a -> return i)
