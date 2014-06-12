@@ -54,7 +54,7 @@ listAllOwners = liftDB (convertPrettifyAddHeader
   ["id", "mail", "marza"]) $
   query "select * from wlasciciel;" []
 
-resetRole = query "reset role;" []
+resetRole = runQuery "reset role;" []
 
 --Owner
 type AsOwner a = AsSomeone a
@@ -90,17 +90,19 @@ ownerUnrealized own = liftDB (convertPrettifyAddHeader
     \ from zamowienie join kupujacy using (kuid) \
      \ where wlid = ? and realizacja is null and zlozenie is not null;") [toSql own]
 ---see all types of products that can be provided
-ownerAvailible :: AsOwner (
+ownerAvailable :: AsOwner (
   DBTransaction [String] )
-ownerAvailible _ = liftDB (convertPrettifyAddHeader
-   ["nazwa", "opis"]) $ 
-    query "select nazwa, opis from typ_produktu;" []
+ownerAvailable wlid = liftDB (convertPrettifyAddHeader
+   ["id","nazwa", "opis","posiadasz"]) $ 
+    query "select tpid, nazwa, opis, count(prid) from typ_produktu join \
+    \ (select prid, tpid from produkt where wlid = ? and zaid is null) X using (tpid) group by tpid, nazwa, opis;" [toSql wlid]
 ---list providers who can deliver particular type of product
-listProviders :: AsOwner (
+ownerProvidersOf :: AsOwner (
   Int -> DBTransaction [String] )
-listProviders _ tp = liftDB (convertPrettifyAddHeader 
+ownerProvidersOf _ tp = liftDB (convertPrettifyAddHeader 
    ["cena", "dostawca"]) $ 
     query "select cena, mail from dostarcza join dostawca using (doid) where tpid = ?;" [toSql tp]
+---
  
 --Buyer
 type AsBuyer a = AsSomeone a
@@ -146,8 +148,15 @@ whoHasX _ tp = liftDB (convertPrettifyAddHeader
 ---see to which order can given product be added
 buyerOrdersOfOwner :: AsBuyer ( Int -> DBTransaction [String])
 buyerOrdersOfOwner buy pr = liftDB (convertPrettifyAddHeader 
-  ["id", "" ]) $
+  ["id", "wartosc" ]) $
     query "select zaid, wartosc from zamowienie join prid using (wlid) where zlozenie is null and kuid = ?;" [toSql buy]
+---see all owners
+buyerOwners :: AsBuyer ( DBTransaction [String])
+buyerOwners id = liftDB (convertPrettifyAddHeader
+  ["id", "kontakt", "nieukonczone zamowienia"]) $
+    query "select wlid, mail, count(zaid) from wlasciciel left outer join (select wlid, zaid from zamowienie where kuid = ? and zlozenie is null) X \
+    \ using (wlid) group by wlid, mail;" [toSql id]
+  
 
 --Provider
 type AsProvider a = AsSomeone a
@@ -167,12 +176,21 @@ addProvision pro tp pr = deleteType pro tp >>
     [toSql tp, toSql pro, toSql pr])
 ---see all types of products
 allTypes :: AsProvider ( DBTransaction [String] )
-allTypes a = ownerAvailible a
---see all owners he provided for
+allTypes a = liftDB (convertPrettifyAddHeader 
+  ["id", "nazwa", "opis", "dostarczam"]) $
+    query "select tpid, nazwa, opis, count(cena) from typ_produktu left outer join \
+    \ dostarcza using (doid) group by tpid, nazwa, opis where doid = ?;" [toSql a]
+---see all owners he provided for
 listOwners :: AsProvider ( DBTransaction [String] )
 listOwners pro = liftDB (convertPrettifyAddHeader
   ["typ_produktu", "kontakt"]) $
     query "select nazwa, mail from produkt join typ_produktu using (tpid) join wlasciciel using (wlid) \
       \ where doid = ?;" $ [toSql pro]
+---see what he provides currently
+listProvisions :: AsProvider (DBTransaction [String])
+listProvisions pro = liftDB (convertPrettifyAddHeader
+  ["id", "nazwa", "cena"]) $
+    query "select tpid, nazwa, cena from typ_produktu join dostarcza using (tpid) \
+    \ where doid = ?;" [toSql pro] 
 
 runT = runTransaction

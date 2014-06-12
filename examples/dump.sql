@@ -6,22 +6,6 @@ SELECT pg_catalog.setval('doid_seq', 10, true);
 
 
 --
--- Data for Name: dostarcza; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY dostarcza (tpid, doid, cena) FROM stdin;
-1 1 100.00
-2 1 10.00
-3 1 23.00
-4 2 123.00
-1 2 109.00
-4 3 11.00
-2 3 78.00
-1 4 93.00
-\.
-
-
---
 -- Data for Name: dostawca; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -77,11 +61,11 @@ SELECT pg_catalog.setval('tpid_seq', 10, false);
 -- Data for Name: typ_produktu; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY typ_produktu (tpid, nazwa, opis) FROM stdin;
-1 hasz to_jest_produkt_kolekcjonerski
-2 koka to_tez
-3 lsd  to_dla_odmiany_tez
-4 doniczka a_w_tym_je_mozna_trzymac
+COPY typ_produktu (tpid, nazwa, opis) FROM stdin with csv;
+1,hasz    ,to_jest_produkt_kolekcjonerski
+2,koka    ,to_tez
+3,lsd     ,to_dla_odmiany_tez
+4,doniczka,a_w_tym_je_mozna_trzymac
 \.
 
 
@@ -115,6 +99,22 @@ SELECT pg_catalog.setval('zaid_seq', 10, false);
 --
 
 COPY zamowienie (zaid, realizacja, zlozenie, wartosc, kuid, wlid) FROM stdin;
+\.
+
+
+--
+-- Data for Name: dostarcza; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY dostarcza (tpid, doid, cena) FROM stdin with csv;
+1,1,100.00
+2,1,10.00
+3,1,23.00
+4,2,123.00
+1,2,109.00
+4,3,11.00
+2,3,78.00
+1,4,93.00
 \.
 
 

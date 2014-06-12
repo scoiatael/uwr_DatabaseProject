@@ -189,7 +189,7 @@ fromButtonList t f = do
   txt <- liftIO $ plainText $ T.pack t
   b <- backButton
   let width = maximum $ map (length) $ t:(ls)
-  cw <- liftIO $ (centered =<< boxFixed width 1 =<< centered txt) 
+  cw <- liftIO $ (centered =<< boxFixed width 2 =<< centered txt) 
     <--> (centered =<< bordered =<< boxFixed width 10 list) <--> (centered b)
   addWidgetToFG fg list
   addWidgetToFG fg b
@@ -199,11 +199,11 @@ fromButtonList t f = do
 
 addWidgetToFG fg w = liftIO $ addToFocusGroup fg w
 
-listScreen :: FrontEnd (String -> IO ()) -> IO (String, [String]) -> FrontEnd (IO ())
-listScreen ch act = do
+listScreen :: String -> FrontEnd (String -> IO ()) -> IO (String, [String]) -> FrontEnd (IO ())
+listScreen title ch act = do
   runInIO $ do
     (x,xs) <- liftIO $ act
-    a <- fromButtonList x (ch >>= \f' -> return (f', xs))
+    a <- fromButtonList (title ++ "\n"++ x) (ch >>= \f' -> return (f', xs))
     liftIO a
 
 doNothing :: FrontEnd (String -> IO ())
@@ -250,3 +250,23 @@ screenChooser list = do
   fs <- sequence $  map snd list
   return $ (chooser $ zip strs fs, strs)
 
+confirmationScreen title answer action = runInIO $ do
+  conn <- takeConn
+  kuid <- takeRo
+  zaid <- takeTp
+  prid <- takePr 
+  st <- takeStack
+  conn <- takeConn
+ 
+  nextScreen <- infoScreen answer 
+  catchErr <- errScreen
+  ok <- makeButton ("Ok", catchErr `inThis` (action kuid zaid prid conn st >> nextScreen))
+  b <- backButton
+  tytul <- simpleText title
+  fg <- simpleFocusGroup
+  addWidgetToFG fg ok
+  addWidgetToFG fg b
+     
+  cw <- liftIO $ (centered tytul) <--> (centered ok) <--> (centered b)
+  a <- addCollection cw fg
+  liftIO a 

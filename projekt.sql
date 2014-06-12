@@ -67,7 +67,8 @@ drop table if exists dostarcza cascade;
 create table dostarcza (
   tpid integer not null references typ_produktu,
   doid integer not null references dostawca,
-  cena decimal(9,2) not null
+  cena decimal(9,2) not null,
+  constraint dostarczaj_tylko_raz_dany_typ unique (tpid, doid)
 );
 
 drop function if exists zwieksz_wartosc_produktu_i_zamowienia() cascade;
@@ -195,6 +196,7 @@ grant insert on produkt to owner;
 grant update on zamowienie to owner;
 grant select on zamowienie, dostarcza, typ_produktu, produkt to owner;
 grant select on dostawca, kupujacy to owner;
+grant all on zaid_seq,doid_seq,wlid_seq to owner;
 
 drop role if exists buyer;
 create role buyer;
@@ -203,6 +205,7 @@ grant update on produkt to buyer;
 grant insert, update on zamowienie to buyer;
 grant select on produkt, typ_produktu,zamowienie to buyer;
 grant select on wlasciciel to buyer;
+grant all on zaid_seq,doid_seq,wlid_seq to buyer;
 
 drop role if exists provider;
 create role provider;
@@ -211,3 +214,4 @@ grant insert, update on typ_produktu, dostarcza to provider;
 grant select on dostarcza, typ_produktu to provider;
 grant select on wlasciciel to provider;
 grant delete on dostarcza to provider;
+grant all on zaid_seq,doid_seq,wlid_seq to provider;

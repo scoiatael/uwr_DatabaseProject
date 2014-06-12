@@ -12,13 +12,31 @@ import Control.Monad.Reader (liftIO, lift)
 import Data.Maybe (fromJust)
 
 main :: IO ()
-main = runFrontEnd $ do
-  w <- fromButtonList "Zaloguj sie jako" $ screenChooser
-    [ ( "Admin",  adminScreen),
-      ( "Kupujacy", loginScreen "Kupujacy" logAsBuyer buyerScreen),
-      ( "Dostawca", loginScreen "Dostawca" logAsProvider providerScreen),
-      ( "Wlasciciel", loginScreen "Wlasciciel" logAsOwner ownerScreen) ]
-  liftIO $ w
+main = runFrontEnd start
+
+start =  do
+  fg <- simpleFocusGroup 
+  st <- takeStack
+  conn <- takeConn
+  next <- chooseRole
+  ok <- makeButton ("Logowanie",
+    do
+      (resetRole `unDB` conn) 
+      next
+    )
+  tytul <- simpleText $ "Witaj w CoffeeShopie "
+  b <- backButton
+  addWidgetToFG fg ok
+  addWidgetToFG fg b
+  cw <- liftIO $ (centered tytul) <--> (centered ok) <--> (centered b)
+  a <- addCollection cw fg
+  liftIO a
+
+chooseRole = fromButtonList "Zaloguj sie jako" $ screenChooser
+  [ ( "Admin",  adminScreen),
+    ( "Kupujacy", loginScreen "Kupujacy" logAsBuyer buyerScreen),
+    ( "Dostawca", loginScreen "Dostawca" logAsProvider providerScreen),
+    ( "Wlasciciel", loginScreen "Wlasciciel" logAsOwner ownerScreen) ]
 
 adminScreen = fromButtonList "Admin" $ screenChooser
   [ ("Dodaj uzytkownika", addUserScreen),
@@ -30,13 +48,13 @@ adminScreen = fromButtonList "Admin" $ screenChooser
 
 listProviderScreen = do
   conn <- takeConn
-  listScreen (doNothing) $ ((listAllProviders `unDB` conn) >>= splitHeader)
+  listScreen "Dostawcy" (doNothing) $ ((listAllProviders `unDB` conn) >>= splitHeader)
 listOwnerScreen = do
   conn <- takeConn
-  listScreen (doNothing) $ ((listAllOwners `unDB` conn) >>= splitHeader)
+  listScreen "Wlasciciele" (doNothing) $ ((listAllOwners `unDB` conn) >>= splitHeader)
 listBuyerScreen = do
   conn <- takeConn
-  listScreen (doNothing) $ ((listAllBuyers `unDB` conn) >>= splitHeader)
+  listScreen "Kupujacy" (doNothing) $ ((listAllBuyers `unDB` conn) >>= splitHeader)
 
 loginScreen n log next = do
   fg <- simpleFocusGroup 
@@ -134,28 +152,28 @@ addUserSimpleScreen n f = do
 buyerScreen = fromButtonList "Kupujacy" $ screenChooser
   [ ( "Historia zamowien", buyerHistoryScreen),                -- > szczegoly zamowienia
     ( "Zobacz produkty", buyerProductScreen ),                 -- > zobacz kto posiada -- > dodaj do zamowienia
-    ( "Zobacz sprzedawcow", placeholder ),              -- > dodaj zamowienie
-    ( "Zobacz niezlozone zamowienia", placeholder ) ]   -- > zloz zamowienie
+    ( "Zobacz sprzedawcow", buyerOwnerScreen ),              -- > dodaj zamowienie
+    ( "Zobacz niezlozone zamowienia", buyerUnfinishedOrdScreen ) ]   -- > zloz zamowienie
 
 buyerHistoryScreen = runInIO $ do
   conn <- takeConn
   rN <- takeRoInt
   tp <- takeTp 
-  a <- listScreen (setMVarAndGoto tp buyerOrderDetailsScreen) $ ((buyerHistory rN `unDB` conn) >>= splitHeader)
+  a <- listScreen "Historia zamowien" (setMVarAndGoto tp buyerOrderDetailsScreen) $ ((buyerHistory rN `unDB` conn) >>= splitHeader)
   liftIO a
 
 buyerOrderDetailsScreen = runInIO $ do
   conn <- takeConn
   kuid <- takeRoInt
   zaid <- takeTpInt
-  a <- listScreen (doNothing) $ ((buyerOrderDetails kuid zaid `unDB` conn) >>= splitHeader)
+  a <- listScreen "Szczegoly zamowienia" (doNothing) $ ((buyerOrderDetails kuid zaid `unDB` conn) >>= splitHeader)
   liftIO a
 
 buyerProductScreen = runInIO $ do
   conn <- takeConn
   kuid <- takeRoInt
   tp <- takeTp 
-  a <- listScreen (setMVarAndGoto tp buyerSeeOwnerOfScreen) $ ((buyerOptions kuid `unDB` conn) >>= splitHeader)
+  a <- listScreen "Dostepne produkty" (setMVarAndGoto tp buyerSeeOwnerOfScreen) $ ((buyerOptions kuid `unDB` conn) >>= splitHeader)
   liftIO a
 
 buyerSeeOwnerOfScreen = runInIO $ do
@@ -163,7 +181,7 @@ buyerSeeOwnerOfScreen = runInIO $ do
   kuid <- takeRoInt
   tpid <- takeTpInt 
   pr <- takePr
-  a <- listScreen (setMVarAndGoto pr buyerOrderScreen) $ ((whoHasX kuid tpid `unDB` conn) >>= splitHeader)
+  a <- listScreen "Wlasciciele produktow" (setMVarAndGoto pr buyerOrderScreen) $ ((whoHasX kuid tpid `unDB` conn) >>= splitHeader)
   liftIO a
   
 buyerOrderScreen = runInIO $ do
@@ -171,7 +189,7 @@ buyerOrderScreen = runInIO $ do
   kuid <- takeRoInt
   tp <- takeTp 
   prid <- takePrInt
-  a <- listScreen (setMVarAndGoto tp buyerAddToOrderScreen) $ ((buyerOrdersOfOwner kuid prid `unDB` conn) >>= splitHeader)
+  a <- listScreen "Dodaj do zamowienia" (setMVarAndGoto tp buyerAddToOrderScreen) $ ((buyerOrdersOfOwner kuid prid `unDB` conn) >>= splitHeader)
   liftIO a
   
 buyerAddToOrderScreen = runInIO $ do
@@ -203,15 +221,186 @@ buyerAddToOrderScreen = runInIO $ do
   liftIO a 
   
 
+buyerOwnerScreen = runInIO $ do
+  conn <- takeConn
+  tp <- takeTp 
+  kuid <- takeRoInt
+  a <- listScreen "Dodaj zamowienie do wlasciciela" (setMVarAndGoto tp buyerAddOrderScreen) $ ((buyerOwners kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+buyerAddOrderScreen = confirmationScreen "Dodac zamowienie do tego sprzedajacego?" "Dodano zamowienie" $ \ku tp pr conn st -> 
+  do
+    kuid <- takeInt ku
+    wlid <- takeInt tp
+    (addOrder kuid wlid `unDB` conn)
+    void $ popFromStack st
+    void $ popFromStack st
+    
+buyerUnfinishedOrdScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp 
+  a <- listScreen "Zloz zamowienie" (setMVarAndGoto tp buyerFinishOrderScreen) $ ((buyerUnfinished kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+buyerFinishOrderScreen = confirmationScreen "Zlozyc to zamowienie?" "Zlozono zamowienie" $ \ku tp pr conn st -> 
+  do
+    kuid <- takeInt ku
+    zaid <- takeInt tp
+    (finishOrder kuid zaid `unDB` conn)
+    void $ popFromStack st
+    void $ popFromStack st
+
+
 ownerScreen = fromButtonList "Wlasciciel" $ screenChooser
-  [ ( "Historia zamowien", placeholder),                -- > szczegly zamowienia
-    ( "Niezrealizowane zamowienia", placeholder),       -- > zrealizuj zamowienie
-    ( "Zobacz swoje produkty", placeholder),
-    ( "Dodaj produkt", placeholder),                    
-    ( "Zobacz dostepne produkty", placeholder) ]        -- > kto je dostarcza -> dodaj produkt
+  [ ( "Historia zamowien", ownerHistoryScreen),                -- > szczegly zamowienia
+    ( "Niezrealizowane zamowienia", ownerUnrealizedScreen),       -- > zrealizuj zamowienie
+    ( "Zobacz dostepne produkty", ownerAvailableScreen) ]        -- > kto je dostarcza -> dodaj produkt
+
+ownerHistoryScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp 
+  a <- listScreen "Historia zamowien" (setMVarAndGoto tp ownerOrderDetailsScreen) $ ((ownerHistory kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+ownerOrderDetailsScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  zaid <- takeTpInt
+  a <- listScreen "Szczegoly zamowienia" (doNothing) $ ((ownerOrderDetails kuid zaid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+ownerUnrealizedScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp 
+  a <- listScreen "Zrealizuj zamowienie" (setMVarAndGoto tp ownerRealizeOrderScreen) $ ((ownerUnrealized kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+ownerRealizeOrderScreen = confirmationScreen "Zrealizowac to zamowienie?" "Zrealizowano zamowienie" $ \ku tp pr conn st -> 
+  do
+    kuid <- takeInt ku
+    zaid <- takeInt tp
+    (realizeOrder kuid zaid `unDB` conn)
+    void $ popFromStack st
+    void $ popFromStack st
+
+ownerAvailableScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp 
+  a <- listScreen "Dostepne produkty" (setMVarAndGoto tp ownerProvidersOfScreen) $ ((ownerAvailable kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+ownerProvidersOfScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tpid <- takeTpInt 
+  pr <- takePr
+  a <- listScreen "Dodaj produkt od dostawcy" (setMVarAndGoto pr ownerAddProductScreen) $ ((ownerProvidersOf kuid tpid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+ownerAddProductScreen = confirmationScreen "Dodac produkt od tego dostawcy?" "Dodano produkt" $ \ku tp pr conn st -> 
+  do
+    kuid <- takeInt ku
+    tpid <- takeInt tp
+    doid <- takeInt pr 
+    (addProduct kuid tpid doid `unDB` conn)
+    void $ popFromStack st
+    void $ popFromStack st
+    void $ popFromStack st
+
 
 providerScreen = fromButtonList "Dostawca" $ screenChooser
-  [ ( "Wspolpracownicy", placeholder),
-    ( "Co dostarczam", placeholder),                    -- > przestan dostarczac
-    ( "Typy produktow", placeholder),                   -- > zacznij dostarczac
-    ( "Dodaj nowy typ produktu", placeholder) ]
+  [ ( "Wspolpracownicy", providerListOwnerScreen),
+    ( "Co dostarczam", providerListProvisionScreen),                    -- > przestan dostarczac
+    ( "Typy produktow", providerAllTypeScreen),                   -- > zacznij dostarczac
+    ( "Dodaj nowy typ produktu", providerAddTypeScreen) ]
+
+providerListOwnerScreen =  runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  a <- listScreen "Wspolpracownicy" (doNothing) $ ((listOwners kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+providerListProvisionScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp
+  a <- listScreen "Co dostarczam" (setMVarAndGoto tp providerDeleteProvisionScreen) $ ((listProvisions kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+providerDeleteProvisionScreen =  confirmationScreen "Przestac dostarczac ten produkt?" "Usunieto produkt" $ \ku tp pr conn st -> 
+  do
+    kuid <- takeInt ku
+    tpid <- takeInt tp
+    (deleteType kuid tpid `unDB` conn)
+    void $ popFromStack st
+    void $ popFromStack st
+
+providerAllTypeScreen = runInIO $ do 
+  conn <- takeConn
+  kuid <- takeRoInt
+  tp <- takeTp
+  a <- listScreen "Zacznij dostarczac" (setMVarAndGoto tp providerAddProvisionScreen) $ ((allTypes kuid `unDB` conn) >>= splitHeader)
+  liftIO a
+
+providerAddProvisionScreen = runInIO $ do
+  fg <- simpleFocusGroup 
+  back <- backButton
+  name <- createEditLineAddFG fg
+  conn <- takeConn
+  nextScreen <- infoScreen "Dodano nowy dostarczany produkt"
+  catchErr <- errScreen
+  errScreen <- infoScreen "Cena powinno byc liczba!"
+  st <- takeStack
+  kuid <- takeRoInt
+  tpid <- takeTpInt
+  ok <- makeButton ("Ok",
+    do
+      txt <- liftM T.unpack $ getEditText name
+      let n = intFromString txt
+      if n == Nothing 
+        then errScreen
+        else catchErr `inThis` do
+          (addProvision kuid tpid (fromJust n) `unDB` conn) 
+          void $ popFromStack st
+          void $ popFromStack st
+          nextScreen
+    )
+  tytul <- simpleText $ "Dostarczanie produktu"
+  addWidgetToFG fg ok
+  addWidgetToFG fg back
+  nGr <- addText "Cena:" name
+  cw <- liftIO $ (centered tytul) <--> (centered nGr) <--> (centered ok) <--> (centered back)
+  a <- addCollection cw fg
+  liftIO a
+
+providerAddTypeScreen = runInIO $ do
+  fg <- simpleFocusGroup 
+  back <- backButton
+  name <- createEditLineAddFG fg
+  desc <- createEditMultiLineAddFG fg
+  conn <- takeConn
+  nextScreen <- infoScreen "Dodano nowy typ produktu"
+  catchErr <- errScreen
+  st <- takeStack
+  kuid <- takeRoInt
+  ok <- makeButton ("Ok", catchErr `inThis` 
+    do
+      txt <- liftM T.unpack $ getEditText name
+      dsc <- liftM T.unpack $ getEditText desc
+      (addType kuid txt dsc `unDB` conn) 
+      void $ popFromStack st
+      void $ popFromStack st
+      nextScreen
+    )
+  tytul <- simpleText $ "Nowy typ produktu"
+  addWidgetToFG fg ok
+  addWidgetToFG fg back
+  nGr <- addText "Nazwa:" name
+  dGr <- addText "Opis:" desc
+  cw <- liftIO $ (centered tytul) <--> (centered nGr) <--> (centered dGr) <--> (centered ok) <--> (centered back)
+  a <- addCollection cw fg
+  liftIO a
