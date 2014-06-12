@@ -143,7 +143,7 @@ buyerUnfinished buy = liftDB (convertPrettifyAddHeader
 buyerOptions :: AsBuyer ( DBTransaction [String] )
 buyerOptions _ = liftDB (convertPrettifyAddHeader 
    ["id","nazwa"]) $ 
-    query "select tpid,nazwa, from typ_produktu join produkt using (tpid) \
+    query "select tpid,nazwa from typ_produktu join produkt using (tpid) \
     \  where zaid is null group by tpid, nazwa;" [] 
 ---see which owner has given product type
 whoHasX :: AsBuyer ( Int -> DBTransaction [String] )
