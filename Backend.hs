@@ -6,6 +6,7 @@ import Data.List
 import Data.Time.LocalTime
 
 mFromSql SqlNull = "Null"
+mFromSql (SqlRational r) = show $ ((fromRational r) :: Double)
 mFromSql a = fromSql a
 
 convertPrettifyAddHeader :: [String] -> [[SqlValue]] -> [String]
@@ -61,7 +62,7 @@ type AsOwner a = AsSomeone a
 ---add new product
 addProduct :: AsOwner ( 
   Int -> Int -> DBTransaction () )
-addProduct own prd prv = runQuery "insert produkt (wlid, tpid, doid) values (?,?,?);" $ 
+addProduct own prd prv = runQuery "insert into produkt (wlid, tpid, doid) values (?,?,?);" $ 
   map toSql [own,prd,prv]
 ---set order to realized -- check if thats his order
 realizeOrder :: AsOwner (
@@ -78,8 +79,10 @@ ownerHistory own = liftDB (convertPrettifyAddHeader
 ownerOrderDetails :: AsOwner (
   Int -> DBTransaction [String] )
 ownerOrderDetails own ord = liftDB (convertPrettifyAddHeader 
-   ["nr produktu", "produkt"] ) $ 
-    query "select * from zamowienie join produkt using (zaid) where wlid = ? and zamowienie.wlid = ?;"
+   ["produkt","cena" ] ) $ 
+    query "select nazwa,cena \
+    \ from zamowienie join produkt using (zaid) join typ_produktu using (tpid) \
+     \ where zamowienie.wlid = ? and zaid = ?;"
      [toSql own, toSql ord]
 ---see unrealized orders and customers contacts
 ownerUnrealized :: AsOwner ( 
@@ -94,7 +97,7 @@ ownerAvailable :: AsOwner (
   DBTransaction [String] )
 ownerAvailable wlid = liftDB (convertPrettifyAddHeader
    ["id","nazwa", "opis","posiadasz"]) $ 
-    query "select tpid, nazwa, opis, count(prid) from typ_produktu join \
+    query "select tpid, nazwa, opis, count(prid) from typ_produktu left outer join \
     \ (select prid, tpid from produkt where wlid = ? and zaid is null) X using (tpid) group by tpid, nazwa, opis;" [toSql wlid]
 ---list providers who can deliver particular type of product
 ownerProvidersOf :: AsOwner (
@@ -125,9 +128,11 @@ buyerHistory buy = liftDB (convertPrettifyAddHeader
 --see details of order
 buyerOrderDetails :: AsBuyer ( Int -> DBTransaction [String])
 buyerOrderDetails buy ord = liftDB (convertPrettifyAddHeader 
-   ["nr produktu", "produkt"] ) $ 
-    query "select * from zamowienie join produkt using (zaid) where zaid = ? and kuid = ?;" 
-     [toSql ord, toSql buy]
+   ["produkt","cena" ] ) $ 
+    query "select nazwa,cena \
+    \ from zamowienie join produkt using (zaid) join typ_produktu using (tpid) \
+     \ where zaid = ?;"
+     [toSql ord]
 ---list all unfinished orders
 buyerUnfinished :: AsBuyer ( DBTransaction [String] )
 buyerUnfinished buy = liftDB (convertPrettifyAddHeader 
@@ -137,19 +142,19 @@ buyerUnfinished buy = liftDB (convertPrettifyAddHeader
 ---list all products that can be added
 buyerOptions :: AsBuyer ( DBTransaction [String] )
 buyerOptions _ = liftDB (convertPrettifyAddHeader 
-   ["id","nazwa", "opis"]) $ 
-    query "select tpid,nazwa,opis from produkt join typ_produktu using (tpid) \
-    \  where zaid is null;" [] 
+   ["id","nazwa","opis"]) $ 
+    query "select tpid,nazwa,opis from typ_produktu join produkt using (tpid) \
+    \  where zaid is null group by tpid, nazwa, opis;" [] 
 ---see which owner has given product type
 whoHasX :: AsBuyer ( Int -> DBTransaction [String] )
 whoHasX _ tp = liftDB (convertPrettifyAddHeader 
-   ["id", "cena", "kontakt"]) $ 
-    query "select wlid, cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;" [toSql tp]
+   ["id produktu", "id wlasciciela", "cena", "kontakt"]) $ 
+    query "select prid, wlid, cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;" [toSql tp]
 ---see to which order can given product be added
 buyerOrdersOfOwner :: AsBuyer ( Int -> DBTransaction [String])
 buyerOrdersOfOwner buy pr = liftDB (convertPrettifyAddHeader 
   ["id", "wartosc" ]) $
-    query "select zaid, wartosc from zamowienie join prid using (wlid) where zlozenie is null and kuid = ?;" [toSql buy]
+    query "select zaid, wartosc from zamowienie where zlozenie is null and kuid = ?;" [toSql buy]
 ---see all owners
 buyerOwners :: AsBuyer ( DBTransaction [String])
 buyerOwners id = liftDB (convertPrettifyAddHeader
@@ -179,7 +184,7 @@ allTypes :: AsProvider ( DBTransaction [String] )
 allTypes a = liftDB (convertPrettifyAddHeader 
   ["id", "nazwa", "opis", "dostarczam"]) $
     query "select tpid, nazwa, opis, count(cena) from typ_produktu left outer join \
-    \ dostarcza using (doid) where doid = ? group by tpid, nazwa, opis;" [toSql a]
+    \ (select cena, tpid from dostarcza where doid = ?) X using (tpid) group by tpid, nazwa, opis;" [toSql a]
 ---see all owners he provided for
 listOwners :: AsProvider ( DBTransaction [String] )
 listOwners pro = liftDB (convertPrettifyAddHeader

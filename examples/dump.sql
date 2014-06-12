@@ -47,6 +47,8 @@ SELECT pg_catalog.setval('prid_seq', 10, false);
 --
 
 COPY produkt (prid, tpid, cena, zaid, doid, wlid) FROM stdin;
+10	1	112.00	\N	1	1
+11	3	25.76	\N	1	1
 \.
 
 
@@ -99,6 +101,7 @@ SELECT pg_catalog.setval('zaid_seq', 10, false);
 --
 
 COPY zamowienie (zaid, realizacja, zlozenie, wartosc, kuid, wlid) FROM stdin;
+10	\N	\N	0	1	1
 \.
 
 

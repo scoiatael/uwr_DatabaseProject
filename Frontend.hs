@@ -208,6 +208,7 @@ buyerAddToOrderScreen = runInIO $ do
       void $ popFromStack st
       void $ popFromStack st
       void $ popFromStack st
+      void $ popFromStack st
       nextScreen
     )
   b <- backButton
@@ -393,7 +394,6 @@ providerAddTypeScreen = runInIO $ do
       txt <- liftM T.unpack $ getEditText name
       dsc <- liftM T.unpack $ getEditText desc
       (addType kuid txt dsc `unDB` conn) 
-      void $ popFromStack st
       void $ popFromStack st
       nextScreen
     )
