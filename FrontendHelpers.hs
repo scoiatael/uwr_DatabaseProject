@@ -178,6 +178,9 @@ infoScreen t = do
   addWidgetToFG fg b
   addCollection cw fg
 
+fixToWidth w txt = let l = length txt; diff = (w - l) `div` 2; pad = replicate diff ' ' in
+  pad ++ txt ++ pad
+
 fromButtonList :: String -> FrontEnd (String -> IO (), [String]) -> FrontEnd (IO ()) 
 fromButtonList t f = do
   (fs,ls) <- f
@@ -185,10 +188,11 @@ fromButtonList t f = do
   fg <- liftIO $ newFocusGroup
   liftIO $ fg `onKeyPressed` \_ k _ -> do
     if k == KEsc then error "Quit" else return False
-  txt <- liftIO $ plainText $ T.pack t
+  let width = maximum $ map (length) $ (lines t)++(ls)
+  txt <- liftIO $ plainText $ T.pack $ foldl (\a b -> b ++ "\n" ++ a) [] $ reverse 
+    $ map (fixToWidth width) $ lines t 
   b <- backButton
-  let width = maximum $ map (length) $ t:(ls)
-  cw <- liftIO $ (centered =<< boxFixed width 2 =<< centered txt) 
+  cw <- liftIO $ (centered =<< boxFixed width 2 txt) 
     <--> (centered =<< bordered =<< boxFixed width 10 list) <--> (centered b)
   addWidgetToFG fg list
   addWidgetToFG fg b

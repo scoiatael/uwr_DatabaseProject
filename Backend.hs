@@ -96,9 +96,9 @@ ownerUnrealized own = liftDB (convertPrettifyAddHeader
 ownerAvailable :: AsOwner (
   DBTransaction [String] )
 ownerAvailable wlid = liftDB (convertPrettifyAddHeader
-   ["id","nazwa", "opis","posiadasz"]) $ 
-    query "select tpid, nazwa, opis, count(prid) from typ_produktu left outer join \
-    \ (select prid, tpid from produkt where wlid = ? and zaid is null) X using (tpid) group by tpid, nazwa, opis;" [toSql wlid]
+   ["id","nazwa", "posiadasz"]) $ 
+    query "select tpid, nazwa, count(prid) from typ_produktu left outer join \
+    \ (select prid, tpid from produkt where wlid = ? and zaid is null) X using (tpid) group by tpid, nazwa;" [toSql wlid]
 ---list providers who can deliver particular type of product
 ownerProvidersOf :: AsOwner (
   Int -> DBTransaction [String] )
@@ -142,9 +142,9 @@ buyerUnfinished buy = liftDB (convertPrettifyAddHeader
 ---list all products that can be added
 buyerOptions :: AsBuyer ( DBTransaction [String] )
 buyerOptions _ = liftDB (convertPrettifyAddHeader 
-   ["id","nazwa","opis"]) $ 
-    query "select tpid,nazwa,opis from typ_produktu join produkt using (tpid) \
-    \  where zaid is null group by tpid, nazwa, opis;" [] 
+   ["id","nazwa"]) $ 
+    query "select tpid,nazwa, from typ_produktu join produkt using (tpid) \
+    \  where zaid is null group by tpid, nazwa;" [] 
 ---see which owner has given product type
 whoHasX :: AsBuyer ( Int -> DBTransaction [String] )
 whoHasX _ tp = liftDB (convertPrettifyAddHeader 
@@ -182,9 +182,9 @@ addProvision pro tp pr = deleteType pro tp >>
 ---see all types of products
 allTypes :: AsProvider ( DBTransaction [String] )
 allTypes a = liftDB (convertPrettifyAddHeader 
-  ["id", "nazwa", "opis", "dostarczam"]) $
-    query "select tpid, nazwa, opis, count(cena) from typ_produktu left outer join \
-    \ (select cena, tpid from dostarcza where doid = ?) X using (tpid) group by tpid, nazwa, opis;" [toSql a]
+  ["id", "nazwa", "dostarczam"]) $
+    query "select tpid, nazwa, count(cena) from typ_produktu left outer join \
+    \ (select cena, tpid from dostarcza where doid = ?) X using (tpid) group by tpid, nazwa;" [toSql a]
 ---see all owners he provided for
 listOwners :: AsProvider ( DBTransaction [String] )
 listOwners pro = liftDB (convertPrettifyAddHeader
