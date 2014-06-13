@@ -14,9 +14,9 @@ $(TECH) : $(TECH).pdf
 
 %.pdf : %.tex
 	@echo "Making $*..."
-	@$(CC) $*.tex > /dev/null
+	@$(CC) $*.tex
 	@echo "..recreating indexes.."
-	@$(CC) $*.tex > /dev/null
+	$(CC) $*.tex > /dev/null
 	@echo "Done"
 
 clean:
