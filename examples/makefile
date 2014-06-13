@@ -9,4 +9,6 @@ populate_database:
 
 clean:
 
+dist:
+
 .PHONY: populate_database all clean

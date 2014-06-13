@@ -9,6 +9,7 @@ BIN=src
 
 TARGETS=$(BIN) $(DOC) $(EXAMPLE)
 CLEAN_TARGETS=$(TARGETS:%=%.clean)
+DIST_TARGETS=$(TARGETS:%=%.dist)
 
 export PROJECT
 export DATABASE
@@ -30,7 +31,10 @@ $(DOC):
 %.clean:
 	@$(MAKE) -C $* clean
 
-dist: clean
+%.dist:
+	@$(MAKE) -C $* dist
+
+dist: $(DIST_TARGETS)
 	-rm -rf $(PROJECT)$(AUTHOR).tgz
 	tar czf $(PROJECT)$(AUTHOR).tgz ./*
 

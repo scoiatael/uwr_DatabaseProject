@@ -3,6 +3,7 @@ TEX=tex
 
 TARGETS=$(HADDOCK) $(TEX)
 CLEAN_TARGETS=$(TARGETS:%=%.clean)
+DIST_TARGETS=$(TARGETS:%=%.dist)
 
 all: $(TARGETS)
 
@@ -15,6 +16,11 @@ $(HADDOCK):
 %.clean:
 	@$(MAKE) -C $* clean
 
+%.dist:
+	@$(MAKE) -C $* dist
+
 clean: $(CLEAN_TARGETS)
 
-.PHONY: all clean $(TARGETS)
+dist: $(DIST_TARGETS)
+
+.PHONY: all clean $(TARGETS) dist

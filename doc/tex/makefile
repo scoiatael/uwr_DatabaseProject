@@ -4,6 +4,7 @@ GUIDE=guide
 TECH=tech
 
 TARGETS=$(ABOUT) $(GUIDE) $(TECH)
+BIN=$(TARGETS:%=%.pdf)
 
 all:$(TARGETS)
 
@@ -19,6 +20,10 @@ $(TECH) : $(TECH).pdf
 	@echo "Done"
 
 clean:
-	-rm -rf *.toc *.log *.aux *.out $(TARGETS:%=%.pdf)
+	-rm -rf *.toc *.log *.aux *.out $(BIN)
 
-.PHONY: clean all $(TARGETS)
+dist: all
+	-@mkdir bin
+	-mv $(BIN) bin/
+
+.PHONY: clean all $(TARGETS) dist

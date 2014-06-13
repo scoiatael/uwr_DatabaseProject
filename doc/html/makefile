@@ -3,4 +3,6 @@ all:
 
 clean:
 
-.PHONY:all clean
+dist:
+
+.PHONY:all clean dist
