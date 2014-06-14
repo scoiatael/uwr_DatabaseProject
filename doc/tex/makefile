@@ -12,7 +12,7 @@ $(ABOUT) : $(ABOUT).pdf
 $(GUIDE) : $(GUIDE).pdf
 $(TECH) : $(TECH).pdf
 
-%.pdf : %.tex
+%.pdf : %.tex main.tex images/*
 	@echo "Making $*..."
 	@$(CC) $*.tex
 	@echo "..recreating indexes.."
@@ -22,8 +22,8 @@ $(TECH) : $(TECH).pdf
 clean:
 	-rm -rf *.toc *.log *.aux *.out $(BIN)
 
-dist: all
-	-@mkdir bin
+dist: all 
+	-@mkdir -p bin
 	-mv $(BIN) bin/
 
 .PHONY: clean all $(TARGETS) dist
