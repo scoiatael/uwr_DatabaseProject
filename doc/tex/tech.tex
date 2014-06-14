@@ -8,7 +8,28 @@
 \clearpage
 \section{Wprowadzenie}
 \subsection{Cel dokumentu}
+Dokument ten ma na celu omówienie struktury, instalacji oraz sposobów zarządzania aplikacji bazodanowej Coffee Shop.
 \section{System}
+Na aplikację CoffeeShop skłądają się 2 komponenty: baza danych napędzana przez silnik PostgreSQL oraz graficzny interfejs użytkownika (GUI) napisany w Haskellu z użyciem bibliotek HDBC, VTY oraz VTY-UI. \\
+Baza danych ma na celu gromadzenie i przetwarzanie informacji, natomiast  GUI ma pozwalać na łatwe wprowadzanie danych oraz ich przeglądanie.\\
+Aplikacja Coffee Shop została stworzona z myślą o systemach Linuksowych i uruchamianiu jej przez terminal. Nie gwarantuje się jej działania na żadnym systemie. Testowana była na systemie ArchLinux64.
 \section{Instalacja}
+W celu rozpoczęcia użytkowania aplikacji Coffee Shop należy:\begin{enumerate}
+  \item Pobrać, zainstalować oraz skonfigurować PostgreSQL. 
+  \item Uruchomić PostgreSQL.
+  \item Stworzyć bazę danych o nazwie 'projekt.db' oraz upewnić się, że użytkownik uruchamiający GUI będzie miał prawo zalogować się do tej bazy jako użytkownik Postgres bez podawania hasła: zywkle można to sprawdzić wydając na tym użytkowniku polecenie \textit{psql -U postgres projekt.db} i sprawdzić, czy zostanie poprawnie wykonane.
+  \item Sprawdzić, czy dołączona do dystrubucji wersja GUI działa na danym systemie (jest skompilowana dla Linuxa x64). Jeśli nie, to należy ją skompilować na tym systemie poleceniem \textit{make bin} $\rightarrow$  patrz niżej.
+  \item Uruchomić GUI, zalogować się jako \textbf{admin} i wybrać opcję 'Stwórz bazę'.
+  \item (opcjonalnie) Zapełnić bazę przykładowymi danymi (polecenie \textit{make example}).
+\end{enumerate}
+W celu zbudowania aplikacji ze źródeł naleźy posiadać narzędzia:\begin{itemize}
+  \item[\textit{sh}] = 4.3.18(1)-release
+  \item[\textit{make}] = 4.0 (GNU Make)
+  \item[\textit{cabal-install}] = 1.20.0.2
+  \item[\textit{GHC}] = 7.8.2
+\end{itemize}
+Prawdopodbnie będzie wymagało to instalacji dodatkowych bibliotek dla Haskella. Można to zrobić poleceniem \textit{cabal update \&\& cabal install hdbc hdbc-postgresql vty-4.7.5 vty-ui}.
 \section{Zarządzanie}
+GUI pozwala na łatwe przeglądanie oraz dodawanie użytkowników. Pozwala także na wyczyszczenie bazy. Nalezy zalogować się jako \textbf{admin} i wybrać odpowiednią opcję. \\
+Każdy użytkownik (klient/dostawca/właściciel) powinien znać swój numer ID. Można go poznać przeglądając jako admin listę użytkowników.
 \end{document}
