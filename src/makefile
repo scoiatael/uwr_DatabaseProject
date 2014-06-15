@@ -3,13 +3,13 @@ PROJECT?='CoffeeShop'
 all: create_binary
 
 create_binary:
-	ghc -o $(PROJECT) $(CFLAGS) Frontend.hs
+	ghc -o $(PROJECT) $(CFLAGS) Main.hs
 
 clean:
 	-rm -rf *.o *.hi $(PROJECT)
 
 run:
-	-@runghc Frontend
+	-@runghc Main
 
 dist: create_binary
 	-@mkdir -p bin
