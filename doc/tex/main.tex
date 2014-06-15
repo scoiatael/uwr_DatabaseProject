@@ -1,19 +1,25 @@
 
 % Podstawowe definicje dla wszystkich dokumentów
 
-\documentclass[12pt]{mwart}
-%\setlength{\textwidth}{83pt}
+\documentclass[12pt]{article}
+\setlength{\textwidth}{440pt}
 
 \usepackage[OT4,plmath]{polski}
 \usepackage{amsmath,amssymb,amsfonts,amsthm,mathtools}
 \usepackage{color}
 \usepackage{fontspec}
 \usepackage{listings,times}
+\lstset{
+  frame=single,
+  breaklines=true,
+  postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
+}
 
 \usepackage{bbm}
 \usepackage[colorlinks=false]{hyperref}
 \usepackage{url}
 \usepackage{graphicx}
+\usepackage{enumitem}
 
 \graphicspath{{images/}}
 
@@ -77,7 +83,7 @@
 
       % Title
       \HRule \\[0.4cm]
-      { \Large Dokumentacja projektu \\[0.5cm] }
+%      { \Large Dokumentacja projektu \\[0.5cm] }
       { \Huge \bfseries Coffee Shop  \\[1cm] }
 
       \textsc{\Large #1\\\large Wersja #2}\\[0.5cm]
