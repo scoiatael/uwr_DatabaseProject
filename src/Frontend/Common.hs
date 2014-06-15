@@ -1,4 +1,4 @@
-module FrontendHelpers where
+module Frontend.Common where
 
 import DBTransaction
 
@@ -10,14 +10,13 @@ import Graphics.Vty.Attributes
 import Graphics.Vty.LLInput
 
 import qualified Data.Text as T
+import Data.Maybe (fromJust)
 import Control.Monad
-import Control.Monad.Reader
-import Control.Concurrent.MVar
-import Data.Time.LocalTime
-
+import Control.Monad.Reader (liftIO, lift, ask, runReaderT, ReaderT)
 import Control.Exception.Base
-
+import Control.Concurrent.MVar
 import Text.Read (readsPrec)
+
 intFromString :: String -> Maybe Int
 intFromString str = case (readsPrec 0 str) :: [(Int, String)] of
   [] -> Nothing
@@ -273,3 +272,33 @@ confirmationScreen title answer action = runInIO $ do
   cw <- liftIO $ (centered tytul) <--> (centered ok) <--> (centered b)
   a <- addCollection cw fg
   liftIO a 
+
+loginScreen n log next = do
+  fg <- simpleFocusGroup 
+  back <- backButton
+  name <- createEditLineAddFG fg
+  conn <- takeConn
+  nextScreen <- next
+  onErr <- errScreen
+  errScreen <- infoScreen "ID powinno byc liczba!"
+  st <- takeStack
+  ro <- takeRo
+  ok <- makeButton ("Ok",
+    do
+      txt <- liftM T.unpack $ getEditText name
+      let n = intFromString txt
+      if n == Nothing 
+        then errScreen
+        else onErr `inThis` do
+          (log (fromJust n) "" `unDB` conn) 
+          void $ popFromStack st
+          void $ popFromStack st
+          pushInt ro $ fromJust n
+          nextScreen
+    )
+  tytul <- simpleText $ "Logowanie - " ++ n
+  addWidgetToFG fg ok
+  addWidgetToFG fg back
+  nGr <- addText "ID:" name
+  cw <- liftIO $ (centered tytul) <--> (centered nGr) <--> (centered ok) <--> (centered back)
+  addCollection cw fg

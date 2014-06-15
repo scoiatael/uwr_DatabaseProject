@@ -9,7 +9,7 @@ clean:
 	-rm -rf *.o *.hi $(PROJECT)
 
 run:
-	runghc Frontend
+	-@runghc Frontend
 
 dist: create_binary
 	-@mkdir -p bin
