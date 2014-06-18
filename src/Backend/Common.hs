@@ -27,6 +27,7 @@ padTo l s = s ++ replicate (l - length s) ' '
 type AsSomeone a = Int -> a
 
 resetRole = runQuery "reset role;" []
+
 logAsBuyer :: Int -> String -> DBTransaction ()
 logAsBuyer i _ = runQuery "select * from zaloguj_jako_kupujacy(?);" [toSql i]
 logAsProvider :: Int -> String -> DBTransaction ()

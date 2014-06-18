@@ -49,7 +49,7 @@ buyerOptions _ = liftDB (convertPrettifyAddHeader
 whoHasX :: AsBuyer ( Int -> DBTransaction [String] )
 whoHasX _ tp = liftDB (convertPrettifyAddHeader 
    ["id produktu", "id wlasciciela", "cena", "kontakt"]) $ 
-    query "select prid, wlid, cena, mail from produkt join wlasciciel using (wlid) where tpid = ?;" [toSql tp]
+    query "select prid, wlid, cena, mail from produkt join wlasciciel using (wlid) where tpid = ? and zaid is null;" [toSql tp]
 ---see to which order can given product be added
 buyerOrdersOfOwner :: AsBuyer ( Int -> DBTransaction [String])
 buyerOrdersOfOwner buy pr = liftDB (convertPrettifyAddHeader 
